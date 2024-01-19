@@ -119,6 +119,7 @@ async function consumeMessages() {
       try {
         if (message?.content && !message?.content.toString().includes('undefined')) {
           const layer = JSON.parse(message.content.toString());
+          console.log(layer)
           const connection = await MongoClient.connect(mongoURL, { tls: false });
           const db = connection.db()
           const users = await db.collection('subs').find({ printer_uid: layer.printer_uid }).limit(8000).toArray();
