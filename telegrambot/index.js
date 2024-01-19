@@ -15,9 +15,9 @@ const bot = new TelegramBot(TELEGRAM_TOKEN, { polling: true });
 bot.onText(/\/start/, (msg) => start(msg));
 bot.onText(/\/open_app/, (msg) => this._openWebApp(msg));
 
-const getS3Link = (path) => {
-    return S3_PUBLIC_URL + path;
-}
+// const getS3Link = (path) => {
+//     return S3_PUBLIC_URL + path;
+// }
 
 async function notifyUsers(subs, data) {
     const warnMsgs = ['- повреждение вайпера', '- ошибка распыления порошка'];
@@ -29,16 +29,16 @@ async function notifyUsers(subs, data) {
 
     const photos = [];
 
-    if (data.svg_image) {
-        photos.push({ type: 'photo', media: getS3Link(data.svg_image) });
-    }
+    // if (data.svg_image) {
+    //     photos.push({ type: 'photo', media: getS3Link(data.svg_image) });
+    // }
 
     if (data.before_melting_image) {
-        photos.push({ type: 'photo', media: getS3Link(data.before_melting_image) });
+        photos.push({ type: 'photo', media: data.before_melting_image });
     }
 
     if (data.after_melting_image) {
-        photos.push({ type: 'photo', media: getS3Link(data.after_melting_image) });
+        photos.push({ type: 'photo', media: data.after_melting_image });
     }
 
   const button = {
@@ -50,21 +50,21 @@ async function notifyUsers(subs, data) {
     inline_keyboard: [[button]]
   };
 
-    for (const sub of subs) {
-        let text = `\n${msg.join('\n\n')}\n\n`;
+  for (const sub of subs) {
+    let text = `\n${msg.join('\n\n')}\n\n`;
 
-        if (sub.telegram_chat_id) {
-              try {
-                  photos[0].caption = text
-                  photos[0].parse_mode = 'markdown'
-                  const msg = await bot.sendMediaGroup(sub.telegram_chat_id, photos);
-                  const messageId = msg[0]?.message_id
-                  await bot.sendMessage(sub.telegram_chat_id, 'Нажми на кнопку, чтобы посмотреть деффекты 👇', { reply_markup: keyboard, reply_parameters: { message_id: messageId } });
-              } catch(er) {
-                  console.log(er);
-              }
-        }
+    if (sub.telegram_chat_id) {
+          try {
+              photos[0].caption = text
+              photos[0].parse_mode = 'markdown'
+              const msg = await bot.sendMediaGroup(sub.telegram_chat_id, photos);
+              const messageId = msg[0]?.message_id
+              await bot.sendMessage(sub.telegram_chat_id, 'Нажми на кнопку, чтобы посмотреть деффекты 👇', { reply_markup: keyboard, reply_parameters: { message_id: messageId } });
+          } catch(er) {
+              console.log(er);
+          }
     }
+  }
 }
 
 const mongoURL = `mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}/${MONGO_INITDB_DATABASE}?authSource=admin`;
