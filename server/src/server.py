@@ -119,6 +119,16 @@ create_crud_routes(Printer, "printers", app)
 #
 #     return JSONResponse(content={"printers": result.printers}, status_code=status.HTTP_200_OK)
 
+@app.get(f"/get_user/telegram_id/{{telegram_id}}", response_model=User)
+async def get_user_by_telegram_id(telegram_id: str, db: AsyncIOMotorDatabase = Depends(connect_to_mongo)):
+    user = await db['users'].find_one({"telegram_chat_id": int(telegram_id)})
+    print(user)
+
+    if not user:
+        return JSONResponse(content='user not found', status_code=404)
+
+    return JSONResponse(content=parse_json(user), status_code=status.HTTP_200_OK)
+
 
 @app.get(f"/get_printers_for_user/{{user_id}}/")
 async def get_printers_for_user(user_id: str, db: AsyncIOMotorDatabase = Depends(connect_to_mongo)):
