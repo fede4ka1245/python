@@ -109,6 +109,7 @@ const QUEUE_NAME = 'layers';
 
 async function consumeMessages() {
   try {
+    console.log(`amqp://${RABBITMQ_USERNAME}:${RABBITMQ_PASSWORD}@${RABBITMQ_HOST}:${RABBITMQ_PORT}`);
     const connection = await amqp.connect(`amqp://${RABBITMQ_USERNAME}:${RABBITMQ_PASSWORD}@${RABBITMQ_HOST}:${RABBITMQ_PORT}`);
     const channel = await connection.createChannel();
     await channel.assertQueue(QUEUE_NAME, { durable: true });
