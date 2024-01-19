@@ -43,7 +43,9 @@ async function notifyUsers(subs, data) {
 
   const button = {
     text: 'Открыть приложение',
-    url: `${SITE_URL}/printerId/${data?.printer_uid}/projectId/${data?.project_id}`
+    web_app: {
+      url: `${SITE_URL}/printer/${data?.printer_uid}/${data?.project_id}`
+    }
   };
 
   const keyboard = {
@@ -80,7 +82,9 @@ const start = async (msg) => {
 const openWebApp = async (msg) => {
   const button = {
     text: 'Открыть приложение',
-    url: SITE_URL
+    web_app: {
+      url: `${SITE_URL}`
+    }
   };
 
   const keyboard = {
