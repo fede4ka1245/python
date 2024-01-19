@@ -72,7 +72,7 @@ async function notifyUsers(subs, data) {
 const mongoURL = `mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}/${MONGO_INITDB_DATABASE}?authSource=admin`;
 
 const start = async (msg) => {
-  await bot.sendMessage(msg.chat.id, 'Это телеграм бот для контроля slm печати');
+  await bot.sendMessage(msg.chat.id, 'Это телеграм бот для контроля frontend печати');
   await openWebApp(msg);
   await regUser(msg.from.id);
 }
@@ -87,7 +87,7 @@ const openWebApp = async (msg) => {
     inline_keyboard: [[button]]
   };
 
-  await bot.sendMessage(msg.chat.id, 'Нажми на кнопку, чтобы подписаться на обновления slm принтера 👇', { reply_markup: keyboard });
+  await bot.sendMessage(msg.chat.id, 'Нажми на кнопку, чтобы подписаться на обновления frontend принтера 👇', { reply_markup: keyboard });
 }
 
 const regUser = async (chatId) => {

@@ -66,3 +66,13 @@ services:
       - .env
     volumes:
       - ./telegrambot:/app
+
+  frontend:
+    build:
+      context: front
+      dockerfile: ./s/Dockerfile
+      args:
+        BACKEND_URL: ${BACKEND_URL}
+    ports:
+      - '3000:3000'
+    restart: always
