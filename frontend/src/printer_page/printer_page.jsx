@@ -79,7 +79,7 @@ const PrinterPage = () => {
         
         axios({
             method:'get',
-            url:`${api}get_all_projects_for_printer/${uid}?page=1&limit=10`
+            url:`${api}/get_all_projects_for_printer/${uid}?page=1&limit=10`
         }).then(response => {
             setProjects(response.data.results)
             console.log(response)
@@ -101,7 +101,7 @@ const PrinterPage = () => {
     const projectsUpdateHandle =() =>{
         axios({
             method:'get',
-            url:`${api}get_all_projects_for_printer/${uid}?page=${page+1}&limit=10`
+            url:`${api}/get_all_projects_for_printer/${uid}?page=${page+1}&limit=10`
         }).then(response =>{
             setProjects([...projects, ...response.data.results])
             setPage(page +1)

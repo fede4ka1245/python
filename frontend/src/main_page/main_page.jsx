@@ -58,7 +58,7 @@ export default function MainPage() {
     useEffect(() =>{
         axios({
             method:'get',
-            url:`${api}get_printers_for_user/${user.id}`,
+            url:`${api}/get_printers_for_user/${user.id}`,
 
         }).then(response =>{
             setPrinters(response.data.printers)
@@ -106,7 +106,7 @@ export default function MainPage() {
         localStorage.removeItem(deletePrinterUid)
         axios({
             method:'get',
-            url: `${api}unsubscribe_from_printer?printer_uid=${deletePrinterUid}&user_id=${user.id}`
+            url: `${api}/unsubscribe_from_printer?printer_uid=${deletePrinterUid}&user_id=${user.id}`
         }).then(() => setPrinters(printers.filter(printer => printer.uid !== deletePrinterUid)))
         .catch(error => console.error('Ошибка при удалении принтера' + error))
 

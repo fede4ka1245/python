@@ -7,7 +7,7 @@ const UserContext = createContext();
 const getUser = (telegramUserId) => {
     return axios({
         method:'get',
-        url:`${api}get_user/telegram_id/${telegramUserId}`
+        url:`${api}/get_user/telegram_id/${telegramUserId}`
     }).then(res =>{
         console.log(res)
         console.log('ok')

@@ -113,7 +113,7 @@ const LayersPage =() =>{
 
         axios({
             method:'get',
-            url:`${api}projects/${projectId}/`
+            url:`${api}/projects/${projectId}/`
         }).then(response =>{
             setProject(response.data)
         }).catch(error => console.error('Ошибка при получении данных проекта: ' + error))
@@ -124,7 +124,7 @@ const LayersPage =() =>{
         
         axios({
             method:'get',
-            url:`${api}get_all_layers_for_project/${projectId}?page=1&limit=10`
+            url:`${api}/get_all_layers_for_project/${projectId}?page=1&limit=10`
         }).then(response =>{
             setLayersCount(response.data.size)
             setLayers(response.data.results)
@@ -155,7 +155,7 @@ const LayersPage =() =>{
     const layersUpdateHandle =() =>{
         axios({
             method:'get',
-            url:`${api}get_all_layers_for_project/${projectId}?page=${page+1}&limit=10`
+            url:`${api}/get_all_layers_for_project/${projectId}?page=${page+1}&limit=10`
         }).then(response => {
             setLayers([...layers, ...response.data.results])
             setPage(page +1)

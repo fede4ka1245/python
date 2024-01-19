@@ -19,12 +19,12 @@ const AddPrinterDrawerComponent = ({setIsAddPrinterDrawerOpen,addPrinterToggleDr
     }
     axios({
       method: 'get',
-      url: `${api}subscribe_for_printer?printer_uid=${uid}&user_id=${user.id}`
+      url: `${api}/subscribe_for_printer?printer_uid=${uid}&user_id=${user.id}`
     }).then(function () {
       
       axios({
         method: 'get',
-        url: `${api}get_printers_for_user/${user.id}`,
+        url: `${api}/get_printers_for_user/${user.id}`,
 
       }).then(function (response) {
         const printersData = response.data.printers;
