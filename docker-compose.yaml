@@ -14,8 +14,6 @@ services:
       MINIO_ADDRESS: ':9000'
       MINIO_CONSOLE_ADDRESS: ':9001'
     command: minio server /data
-    networks:
-      - slm
 
 
   rabbitmq:
@@ -31,8 +29,6 @@ services:
     ports:
       - 15672:15672
       - 5672:5672
-    networks:
-      - slm
 
   mongodb:
     image: mongo:latest
@@ -59,8 +55,6 @@ services:
       - .env
     volumes:
       -  ./server/src:/app/src
-    networks:
-      - slm
 
   telegrambot:
     depends_on:
@@ -72,9 +66,3 @@ services:
       - .env
     volumes:
       - ./telegrambot:/app
-    networks:
-      - slm
-
-networks:
-  slm:
-    driver: bridge
