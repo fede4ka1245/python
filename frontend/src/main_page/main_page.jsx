@@ -142,7 +142,7 @@ export default function MainPage() {
                 } variant="outlined"><AddIcon fontSize="large"/> Добавить принтер</Button>
 
             </div>
-            {printers.length ? <div className="print_list_wrapper" style={{padding:'0px 5px'}}>
+            {printers?.length ? <div className="print_list_wrapper" style={{padding:'0px 5px'}}>
                 <List>
                     {printers.map((printer) => (
                         <PrintListItem 
