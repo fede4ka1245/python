@@ -58,9 +58,9 @@ async function notifyUsers(subs, data) {
         photos[0].caption = text
         photos[0].parse_mode = 'markdown'
         await bot.sendMediaGroup(sub.telegram_chat_id, photos);
-        if (data.svg_image) {
-          await bot.sendDocument(sub.telegram_chat_id, data.svg_image);
-        }
+        // if (data.svg_image) {
+        //   await bot.sendDocument(sub.telegram_chat_id, data.svg_image);
+        // }
         await bot.sendMessage(sub.telegram_chat_id, 'Нажми на кнопку, чтобы посмотреть деффекты 👇', { reply_markup: keyboard });
       } catch(er) {
         console.log(er);
@@ -136,4 +136,4 @@ async function consumeMessages() {
 
 setTimeout(() => {
   consumeMessages();
-}, 5000);
+}, 8000);
