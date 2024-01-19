@@ -139,7 +139,7 @@ const LayersPage =() =>{
         parseProjectData()
     },[])
     useEffect(() =>{ 
-        if (Object.keys(project).length !== 0) {
+        if (Object.keys(project)?.length !== 0) {
             parseLayers();
         }
        
@@ -183,7 +183,7 @@ const LayersPage =() =>{
                     
                 
             </div> 
-            {layers.length ? <div className="layer_list_wrapper" style={{padding:'0px 5px'}}>
+            {layers?.length ? <div className="layer_list_wrapper" style={{padding:'0px 5px'}}>
                         <List>
                             {layers.map((layer) => 
                                 <LayerListItem navigate={navigate} projectId={projectId} uid={uid} layer={layer} key={layer.id} />)}

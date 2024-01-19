@@ -58,7 +58,7 @@ const PrinterPage = () => {
 
     const {printers} = usePrinters();
     const parsePrinter =(printers) =>{
-        for (let i = 0;i<printers.length;i++){
+        for (let i = 0;i<printers?.length;i++){
             if (printers[i].uid === uid){
                 return printers[i]
             }
@@ -135,7 +135,7 @@ const PrinterPage = () => {
 
                 </div>
             </div>
-            {projects.length ?<div className="task_list" style={{padding:'0px 5px'}}>
+            {projects?.length ?<div className="task_list" style={{padding:'0px 5px'}}>
                 <List>
                     {projects.map((project) => (
                         <ProjectListItem navigateToProject={navigateToProject} project={project} key={project.id} />
