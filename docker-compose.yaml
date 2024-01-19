@@ -44,6 +44,7 @@ services:
         - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
 
   back:
+    hostname: back
     depends_on:
       - rabbitmq
       - mongodb
@@ -68,11 +69,21 @@ services:
       - ./telegrambot:/app
 
   frontend:
+    hostname: front
     build:
-      context: front
-      dockerfile: ./s/Dockerfile
+      context: .
+      dockerfile: ./frontend/Dockerfile
       args:
         BACKEND_URL: ${BACKEND_URL}
     ports:
       - '3000:3000'
     restart: always
+
+  nginx:
+    build:
+      context: .
+      dockerfile: ./nginx/Dockerfile
+    ports:
+      - '80:80'
+    restart: always
+
