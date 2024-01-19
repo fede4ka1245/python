@@ -15,8 +15,26 @@ from bson import ObjectId
 from shared import connect_to_mongo, close_mongo_connection, parse_json, s3, generate_unique_filename, \
     create_crud_routes
 from shared.orm import *
+from shared import connect_rabbitmq
 
 telegram_bot = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
+
+
+def get_s3_url(path):
+    if not path:
+        return None
+
+    return f'{S3_USER_URL}{path}'
+
+
+def process_layer(layer):
+    print(layer)
+    res = parse_json(layer)
+    res['before_melting_image'] = get_s3_url(layer.get('before_melting_image'))
+    res['after_melting_image'] = get_s3_url(layer.get('after_melting_image'))
+    res['svg_image'] = get_s3_url(layer.get('svg_image'))
+
+    return res
 
 
 async def notify_users(subs, data):
@@ -32,10 +50,12 @@ async def notify_users(subs, data):
         photos.append(SimpleNamespace(**{'type': 'photo', 'media': data['svg_image'], 'caption': 'svg'}))
 
     if data.get('before_melting_image'):
-        photos.append(SimpleNamespace(**{'type': 'photo', 'media': data['before_melting_image'], 'caption': 'до плавления'}))
+        photos.append(
+            SimpleNamespace(**{'type': 'photo', 'media': data['before_melting_image'], 'caption': 'до плавления'}))
 
     if data.get('after_melting_image'):
-        photos.append(SimpleNamespace(**{'type': 'photo', 'media': data['after_melting_image'], 'caption': 'после плавления'}))
+        photos.append(
+            SimpleNamespace(**{'type': 'photo', 'media': data['after_melting_image'], 'caption': 'после плавления'}))
 
     for sub in subs:
         text = "\n".join(msg) + '\n\n'
@@ -168,22 +188,30 @@ async def add_photos_to_layer(
     response = {**layer}
     if before_melting_image:
         file_name = generate_unique_filename(before_melting_image.filename)
-        s3.upload_fileobj(before_melting_image.file, S3_BUCKET_PICS, file_name)
+        s3.upload_fileobj(before_melting_image.file, S3_BUCKET_PICS, file_name, ExtraArgs={'ContentType': 'image/jpeg'})
         response['before_melting_image'] = f'/{S3_BUCKET_PICS}/{file_name}'
     if after_melting_image:
         file_name = generate_unique_filename(after_melting_image.filename)
-        s3.upload_fileobj(after_melting_image.file, S3_BUCKET_PICS, file_name)
+        s3.upload_fileobj(after_melting_image.file, S3_BUCKET_PICS, file_name, ExtraArgs={'ContentType': 'image/jpeg'})
         response['after_melting_image'] = f'/{S3_BUCKET_PICS}/{file_name}'
     if svg_image:
         file_name = generate_unique_filename(svg_image.filename)
-        s3.upload_fileobj(svg_image.file, S3_BUCKET_PICS, file_name)
+        s3.upload_fileobj(svg_image.file, S3_BUCKET_PICS, file_name, ExtraArgs={'ContentType': 'image/svg+xml'})
         response['svg_image'] = f'/{S3_BUCKET_PICS}/{file_name}'
 
-    if layer['warns'] is not None and len(layer['warns']) != 0:
-        users = await db["subs"].find({"printer_uid": layer["printer_uid"]}).to_list(length=1000)
-        await notify_users(users, response)
+    if response.get('warns') and len(response.get('warns')) > 0:
+        connection = connect_rabbitmq()
+        channel = connection.channel()
+        channel.basic_publish(exchange='', routing_key='layers', body=json.dumps(process_layer(response)).encode())
+        connection.close()
 
-    return JSONResponse(content=parse_json(response), status_code=status.HTTP_200_OK)
+    await db['layers'].find_one_and_update(
+        {"_id": ObjectId(parse_json(response)['id'])},
+        {'$set': parse_json(response)},
+        upsert=True
+    )
+
+    return JSONResponse(content=process_layer(response), status_code=status.HTTP_200_OK)
 
 
 @app.get(f"/get_all_projects_for_printer/{{printer_uid}}")
@@ -263,7 +291,7 @@ async def get_all_layers_for_project(
 
         cursor = db["layers"].find({"project_id": project_id}).skip((page - 1) * limit).limit(limit)
 
-        result = [parse_json(doc) for doc in await cursor.to_list(length=limit)]
+        result = [process_layer(layer) for layer in await cursor.to_list(length=limit)]
 
         return JSONResponse(
             content={"results": result, "total_pages": total_pages, "current_page": page, "size": layers},
