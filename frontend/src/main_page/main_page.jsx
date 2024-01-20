@@ -11,20 +11,22 @@ import ListItem from '@mui/material/ListItem';
 import IconButton from '@mui/material/IconButton';
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import Typography from '@mui/material/Typography';
-import AddIcon from '@mui/icons-material/Add';
-
 import AddPrinterDrawerComponent from '../components/add_printer_drawer_component';
 import OptionsPrinterDrawerComponent from '../components/options_printer_drawer_component';
 import { usePrinters } from '../context/printer_context';
 import { useUser } from '../context/user_context';
+import {Grid} from "@mui/material";
+import AppButton from '../ui/button/Button';
+import Header from "../components/Header";
+import Tappable from "../ui/tappable/Tappable";
+
 const PrintListItem = ({printer, navigateToPrinter,handleDeletedPrinter }) => {
     return (
-        <ListItem disablePadding style={{backgroundColor:'#332D41', borderRadius:'15px', marginBottom:'10px'}}>
+        <ListItem disablePadding style={{backgroundColor:'var(--bg-color)', borderRadius:'15px', marginBottom:'10px'}}>
             <ListItemButton>
-                
-                <ListItemText onClick={() => {navigateToPrinter(printer)}} primary={`${printer.name},  UID:${printer.uid}`} primaryTypographyProps={{
+                <ListItemText onClick={() => {navigateToPrinter(printer)}} primary={`${printer.name}`} primaryTypographyProps={{
                     sx: {
-                        color: 'var(--text-color)',
+                        color: 'var(--text-secondary-color)',
                         fontWeight: 'bold',
                         paddingBottom: '10px',
                         fontSize: '20px',
@@ -34,15 +36,17 @@ const PrintListItem = ({printer, navigateToPrinter,handleDeletedPrinter }) => {
                     }
                 }} secondaryTypographyProps={{
                     sx: {
-                        color: 'var(--text-color)',
+                        color: 'var(--hint-color)',
+                        fontWeight: 'bold',
                         '@media screen and (max-width: 768px)': {
                             fontSize: '12px',
                         }
                     }
-                }} secondary={printer.description} />
-                <IconButton onClick={() => {handleDeletedPrinter(printer.uid)}} >
-                    <MenuOutlinedIcon sx={{ color: 'var(--text-color)', fontSize: '30px' }} />
-                </IconButton>
+                }} secondary={`uid: ${printer.uid}`} />
+
+                <Tappable style={{ borderRadius: '50%', width: '50px', height: '50px' }} onClick={() => {handleDeletedPrinter(printer.uid)}} >
+                    <MenuOutlinedIcon sx={{ color: 'var(--text-secondary-color)', fontSize: '40px' }} />
+                </Tappable>
             </ListItemButton>
         </ListItem>
     )
@@ -59,13 +63,11 @@ export default function MainPage() {
         axios({
             method:'get',
             url:`${api}/get_printers_for_user/${user.id}`,
-
         }).then(response =>{
             setPrinters(response.data.printers)
             user.printers = response.data.printers
             const localUser = JSON.parse(localStorage.getItem('user'))
             localUser.printers = response.data.printers
-            localStorage.setItem('user',JSON.stringify(localUser))
         }).catch(error => console.log("Ошибка получения принтеров usera" + error))
     }, [])
 
@@ -120,42 +122,42 @@ export default function MainPage() {
     }
 
     return (
-        
         <div className="main_page">
-            <div className="add_print" style={{
-                width:'100%',
-                display:'flex',
-                justifyContent:'center',
-                alignItems:'center'
-            }}>
-                <Button onClick={addPrinterToggleDrawer(true)} className='add_print_btn' style={
-                    {
-                        display:'flex',
-                        justifyContent:'space-between',
-                        alignItems:'center',
-                        width:'150px',
-                        height:'60px',
-                        color: 'var(--text-color)',
-                        borderColor: 'var(--text-color)',
-                        borderRadius:'30px'
-                    }   
-                } variant="outlined"><AddIcon fontSize="large"/> Добавить принтер</Button>
-
-            </div>
-            {printers?.length ? <div className="print_list_wrapper" style={{padding:'0px 5px'}}>
+            <Header>
+              <Typography
+                flex={1}
+                color={'var(--text-secondary-color)'}
+                fontSize={'var(--font-size-md)'}
+                fontWeight="bold"
+                lineHeight={1.1}
+                overflow='hidden'
+              >
+                Принтеры
+              </Typography>
+              <AppButton onClick={addPrinterToggleDrawer(true)} variant="filled">
+                <Typography
+                  color={'var(--text-secondary-color)'}
+                  fontSize={'var(text-size-sm)'}
+                  fontWeight="bold"
+                  lineHeight={1.1}
+                >
+                  Добавить
+                </Typography>
+              </AppButton>
+            </Header>
+            {!!printers?.length && <div className="print_list_wrapper">
                 <List>
                     {printers.map((printer) => (
                         <PrintListItem 
-                        handleDeletedPrinter={handleDeletedPrinter} 
-                        navigateToPrinter={navigateToPrinter} 
-                        setIsOptionsPrinterDrawerOpen={setIsOptionsPrinterDrawerOpen} 
-                        printer={printer}  
-                        key={printer.id}  />
+                            handleDeletedPrinter={handleDeletedPrinter}
+                            navigateToPrinter={navigateToPrinter}
+                            setIsOptionsPrinterDrawerOpen={setIsOptionsPrinterDrawerOpen}
+                            printer={printer}
+                            key={printer.id}
+                        />
                     ))}
                 </List>
-            </div> : <div style={{width:'100%',height:'90vh'}}> <Typography variant="h6" sx={{color:'var(--text-color)', display:'flex', alignItems:'center', justifyContent:'center', width:'100%',height:'100%'}} gutterBottom>
-                        Похоже тут ничего нет
-                    </Typography></div>}
+            </div>}
             
             <div className="drawers">
                 <AddPrinterDrawerComponent

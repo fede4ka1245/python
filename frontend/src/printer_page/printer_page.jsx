@@ -15,32 +15,34 @@ import Button from '@mui/material/Button';
 import './printer_page.css';
 import axios from 'axios';
 import api from '../api';
+import {Grid} from "@mui/material";
+import Header from "../components/Header";
+import AppButton from "../ui/button/Button";
 
 const ProjectListItem = ({navigateToProject, project }) => {
     return (
-        <ListItem disablePadding  style={{backgroundColor:'#332D41', borderRadius:'15px', marginBottom:'10px'}}>
+        <ListItem disablePadding  style={{backgroundColor:'var(--bg-color)', borderRadius:'15px', marginBottom:'10px'}}>
             <ListItemButton >
                 <div className='content' onClick={() => {navigateToProject({project}) }}>
-                        <ListItemText primary={project.name}   primaryTypographyProps={{
-                            sx: {
-                                color: 'var(--text-color)',
-                                fontWeight: 'bold',
-                                paddingBottom: '10px',
-                                fontSize: '20px',
-                                
-                            }
-                        }}   >
-                        </ListItemText>
-                        
-                        <ListItemText primaryTypographyProps={{sx: {
-                                color: 'var(--text-color)',
-                                fontWeight: 'bold',
-                                paddingBottom: '10px',
-                                fontSize: '20px',
-                                display: 'flex',
-                                justifyContent:'flex-end',                        
-                            }}}  primary={`${project.layers_len} слоёв`}></ListItemText>
-                            </div>
+                  <Grid>
+                    <ListItemText primary={'Проект: ' + project?.name}   primaryTypographyProps={{
+                      sx: {
+                        color: 'var(--text-secondary-color)',
+                        fontWeight: 'bold',
+                        fontSize: 'var(--font-size-sm)'
+                      }
+                    }}>
+                    </ListItemText>
+                    <ListItemText primaryTypographyProps={{sx: {
+                        color: 'var(--hint-color)',
+                        fontWeight: 'bold',
+                        paddingBottom: '10px',
+                        fontSize: '16px',
+                        display: 'flex',
+                      }}}  primary={`${project.layers_len} слоёв`}>
+                    </ListItemText>
+                  </Grid>
+                  </div>
                     </ListItemButton>
                 
         </ListItem>
@@ -66,7 +68,7 @@ const PrinterPage = () => {
     }
     const printer = parsePrinter(printers)
     
-    const name = printer.name 
+    const name = printer?.name
 
     const navigateToProject =({project}) =>{
         navigate(`/printer/${uid}/${project.id}`,)
@@ -112,30 +114,30 @@ const PrinterPage = () => {
     }
    
 
-    const media = useMediaQuery('(max-width:768px)'); // MUI хук медиа запрос 
-
+    const media = useMediaQuery('(max-width:768px)'); // MUI хук медиа запрос
     let navigate = useNavigate();
     const navigateBack = () => {
         navigate(`/`,)
     }
     return (
         <div className='printer_page'>
-            <div className="printer_top">
-                <Fab onClick={() => { navigateBack() }} size={media ? 'small' : 'large'}
-                    sx={{ bgcolor: 'var(--text-color)' }}>
-                    <ArrowBackIcon sx={{ color: 'var(--bg-color)', }} />
-                </Fab>
-                <div className="printer_about">
-                    <Typography variant="h6" className='printer_about_text' gutterBottom>
-                        {printer.description}
-                    </Typography>
-                    <Typography variant="h6" className='printer_about_text' gutterBottom>
-                        {name}
-                    </Typography>
-
-                </div>
-            </div>
-            {projects?.length ?<div className="task_list" style={{padding:'0px 5px'}}>
+          <Header>
+            <Fab onClick={navigateBack} size={'medium'} sx={{ background: 'var(--primary-color)', minWidth: '48px' }}>
+              <ArrowBackIcon sx={{ color: 'var(--bg-color)', }} />
+            </Fab>
+            <Typography
+              flex={1}
+              color={'var(--text-secondary-color)'}
+              fontSize={'var(--font-size-md)'}
+              fontWeight="bold"
+              lineHeight={1.1}
+              overflow='hidden'
+              pl={2}
+            >
+              {name}
+            </Typography>
+          </Header>
+            {projects?.length ?<div className="task_list">
                 <List>
                     {projects.map((project) => (
                         <ProjectListItem navigateToProject={navigateToProject} project={project} key={project.id} />
@@ -146,9 +148,16 @@ const PrinterPage = () => {
                     </Typography></div>}
             {buttonVisible  ? 
             <>
-            <Button variant="contained" style={{ backgroundColor: 'var(--text-color)', color: 'var(--bg-color)' }} onClick={() => {projectsUpdateHandle()}}>
-                Загрузить ещё
-            </Button>
+              <AppButton fullWidth onClick={projectsUpdateHandle} variant="filled">
+                <Typography
+                  color={'var(--text-secondary-color)'}
+                  fontSize={'var(text-size-sm)'}
+                  fontWeight="bold"
+                  lineHeight={1.6}
+                >
+                  Загрузить ещё
+                </Typography>
+              </AppButton>
             <div style={{height:'40px', width:'100%'}}></div>
             </> : <></>}
             

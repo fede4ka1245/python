@@ -5,10 +5,6 @@ const PrinterContext = createContext();
 export const PrinterProvider = ({ children }) => {
     const [printers, setPrinters] = useState([]);
 
-    useEffect(() => {
-        localStorage.setItem('printers', JSON.stringify(printers));
-    }, [printers]);
-    
     return (
         <PrinterContext.Provider value={{ printers, setPrinters,  }}>
             {children}

@@ -7,9 +7,8 @@ const OptionsPrinterDrawerComponent = ({deletePrinterUid, printers, setPrinters,
 
 
     const drawerContent = () => (
-        <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'column', height: '150px', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}>
-            <Button style={{ margin: '20px 0 ', }} color='error' variant="outlined" onClick={() =>{deletePrinter({deletePrinterUid,printers, setPrinters})}}>Удалить</Button>
-            <Button style={{ borderColor: 'var(--text-color)', color: 'var(--text-color)' }} variant="outlined" onClick={toggleDrawer(false)}>Закрыть</Button>
+        <div style={{ display: 'flex', padding: '10px', alignItems: 'center', flexDirection: 'column', height: '150px', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}>
+            <Button fullWidth style={{ borderRadius: 'var(border-radius-sm)' }} color='error' variant="outlined" onClick={() =>{deletePrinter({deletePrinterUid,printers, setPrinters})}}>Удалить</Button>
         </div>
     )
 

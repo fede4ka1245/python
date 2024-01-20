@@ -1,14 +1,3 @@
-.layers_page {
-    max-width: 50%; /* или любая другая фиксированная ширина */
-    margin: 0 auto;
-    min-height: 100vh;
-    max-height: 100%;
-    /* border:   1px solid black; */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: var(--bg-color);
-}
 .layer_top {
     margin: 20px 15px;
     display: flex;
@@ -24,20 +13,4 @@
 .layer_list_wrapper{
     width: 100%;
     height: auto;
-}
-@media screen and (max-width: 768px) {
-    .layers_page {
-        max-width: 100%; /* или любая другая фиксированная ширина */
-    }
-    .layer_about {
-        gap: 35px;
-    }
-}
-@media screen and (max-width:400px) {
-    .layer_about {
-        gap: 25px;
-    }
-    .about_text{
-        font-size: 18px;
-    }    
 }

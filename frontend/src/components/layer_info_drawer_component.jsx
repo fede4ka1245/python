@@ -12,23 +12,24 @@ const LayerInfoDrawerComponent =({layer,isDrawerOpen,toggleDrawer}) =>{
          return(
             
             <div  className="drawer_container">
-                
-                
-                    <hr />
-                    <Typography variant="h6" className='img_text' gutterBottom>
-                        svg_image:
+                    <Typography variant="h6" className='img_text'>
+                        SVG
                     </Typography>
-                    <img src={layer.svg_image} alt="" />
-                    <hr />
-                    <Typography variant="h6" className='img_text' gutterBottom>
-                        before_melting_image:
+                    <img
+                      className={'img-preview'}
+                      src={layer.svg_image}
+                      alt=""
+                    />
+                    <Typography variant="h6" className='img_text'>
+                        До плавлния
                     </Typography>
-                    <img src={layer.before_melting_image} alt="" />
-                    <hr />
-                    <Typography variant="h6" className='img_text' gutterBottom>
-                        after_melting_image:
+                    <img                      className={'img-preview'}
+                                              src={layer.before_melting_image} alt="" />
+                    <Typography variant="h6" className='img_text'>
+                        После плавления
                     </Typography>
-                    <img src={layer.after_melting_image} alt="" />  
+                    <img                       className={'img-preview'}
+                                               src={layer.after_melting_image} alt="" />
                 
                 
                  
@@ -46,6 +47,7 @@ const LayerInfoDrawerComponent =({layer,isDrawerOpen,toggleDrawer}) =>{
         <>
             <Drawer sx={{
             '& .MuiDrawer-paper': {
+              height: 'calc(100vh - 80px)',
                 maxWidth: '50%',
                 margin: '0 auto',
                 bgcolor: 'var(--bg-color)',

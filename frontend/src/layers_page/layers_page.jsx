@@ -14,9 +14,12 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import axios from 'axios';
 import api from '../api';
+import {Grid, ListItemAvatar} from "@mui/material";
+import AppButton from "../ui/button/Button";
+import Header from "../components/Header";
 
 //нужно чтобы бот находил по id юзера и мог написать ему
-const LayerListItem = ({layer,uid, projectId, navigate }) => {
+const LayerListItem = ({layer, uid, projectId, navigate }) => {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
     const toggleDrawer = (open) => (event) => {
@@ -27,7 +30,6 @@ const LayerListItem = ({layer,uid, projectId, navigate }) => {
             navigate(``, { replace: true });
         }
         setIsDrawerOpen(open);
-        
     }
 
 
@@ -42,7 +44,6 @@ const LayerListItem = ({layer,uid, projectId, navigate }) => {
     const updateUrlWithParams =(uid, projectId, layerId, navigate) =>{
         const params = createParams(uid,projectId,layerId)
         navigate(`?${params}`, { replace: true });
-
     }
 
 
@@ -52,29 +53,26 @@ const LayerListItem = ({layer,uid, projectId, navigate }) => {
     }
     return (
         <>
-        <ListItem disablePadding style={{backgroundColor:'#332D41', borderRadius:'15px', marginBottom:'10px'}} onClick={() =>{listItemOnClick(uid, projectId, layer.id, navigate)}}>
+        <ListItem disablePadding style={{backgroundColor:'var(--bg-color)', borderRadius:'15px', marginBottom:'10px'}} onClick={() =>{listItemOnClick(uid, projectId, layer.id, navigate)}}>
             <ListItemButton >
-                        <ListItemText primary={`Слой ${layer.order +1}`} secondary={layer.timestamp}   primaryTypographyProps={{
-                            sx: {
-                                color: 'var(--text-color)',
-                                fontWeight: 'bold',
-                                paddingBottom: '10px',
-                                fontSize: '20px',
-                                
-                            }
-                        }} secondaryTypographyProps={{
-                            sx: {
-                                color: 'var(--text-color)',
-                                '@media screen and (max-width: 768px)': {
-                                    fontSize: '12px',
-                                }
-                            } 
-                          }}  >
-                        </ListItemText>
-                        
-                       
-                    </ListItemButton>
-                
+              <ListItemAvatar>
+                <img
+                  loading={'lazy'}
+                  width={'60px'}
+                  height={'60px'}
+                  style={{ borderRadius: 'var(--border-radius-sm)'}}
+                  src={layer.svg_image}
+                />
+              </ListItemAvatar>
+              <Grid flexDirection={'column'} pl={2} display={'flex'} height={'100%'}>
+                <Typography fontWeight={'bold'} color='var(--text-secondary-color)' fontSize={'var(--font-size-md)'}>
+                  Слой #{layer.order}
+                </Typography>
+                {!!layer.warns?.length && <Typography fontWeight={'bold'} color='orange' fontSize={'12px'}>
+                  Ошибка печати
+                </Typography>}
+              </Grid>
+            </ListItemButton>
         </ListItem>
         
         <LayerInfoDrawerComponent layer={layer} isDrawerOpen={isDrawerOpen} toggleDrawer={toggleDrawer} />
@@ -166,42 +164,56 @@ const LayersPage =() =>{
     }
     const matches = useMediaQuery('(max-width:768px)');
     return(
+      <>
+        <Header>
+          <Fab onClick={navigateBack} size={'medium'} sx={{ background: 'var(--primary-color)', minWidth: '48px' }}>
+            <ArrowBackIcon sx={{ color: 'var(--bg-color)', }} />
+          </Fab>
+          <Grid direction={'column'}>
+            <Typography
+              flex={1}
+              color={'var(--text-secondary-color)'}
+              fontSize={'var(--font-size-md)'}
+              fontWeight="bold"
+              lineHeight={1.1}
+              overflow='hidden'
+              pl={2}
+            >
+              {project.name}
+            </Typography>
+            <Typography
+              flex={1}
+              color={'var(--hint-color)'}
+              fontSize={'var(--font-size-sm)'}
+              fontWeight="bold"
+              lineHeight={1.1}
+              overflow='hidden'
+              pl={2}
+            >
+              слои: {layers?.length} / {project?.layers_len}
+            </Typography>
+          </Grid>
+        </Header>
         <div className="layers_page">
-            <div className="layer_top">
-                <Fab onClick={() => { navigateBack() }} size={matches ? 'small' : 'large'}
-                    sx={{ bgcolor: 'var(--text-color)' }}>
-                    <ArrowBackIcon sx={{ color: 'var(--bg-color)', }} />
-                </Fab>
-                <div className="layer_about">
-                <Typography variant="h6" className='printer_about_text' gutterBottom>
-                        <p className="about_text"> {layersCount} слоев из {project.layers_len}</p>   
-                    </Typography>
-                    <Typography variant="h6" className='printer_about_text' gutterBottom>
-                        <p className="about_text">{project.name}</p>    
-                    </Typography>
-                </div>
-                    
-                
-            </div> 
-            {layers?.length ? <div className="layer_list_wrapper" style={{padding:'0px 5px'}}>
-                        <List>
-                            {layers.map((layer) => 
-                                <LayerListItem navigate={navigate} projectId={projectId} uid={uid} layer={layer} key={layer.id} />)}
-                        </List>
-                    </div> : <div style={{width:'100%',height:'90vh'}}> <Typography variant="h6" sx={{color:'var(--text-color)', display:'flex', alignItems:'center', justifyContent:'center', width:'100%',height:'100%'}} gutterBottom>
-                        Похоже тут ничего нет
-                    </Typography></div>}
-            {buttonVisible ? 
+          {layers?.length ? <div className="layer_list_wrapper" style={{padding:'0px 5px'}}>
+            <List>
+              {layers.map((layer) =>
+                <LayerListItem navigate={navigate} projectId={projectId} uid={uid} layer={layer} key={layer.id} />)}
+            </List>
+          </div> : <div style={{width:'100%',height:'90vh'}}> <Typography variant="h6" sx={{color:'var(--text-color)', display:'flex', alignItems:'center', justifyContent:'center', width:'100%',height:'100%'}} gutterBottom>
+            Похоже тут ничего нет
+          </Typography></div>}
+          {buttonVisible ?
             <>
-            <Button variant="contained" style={{ backgroundColor: 'var(--text-color)', color: 'var(--bg-color)',}}  onClick={() => {layersUpdateHandle()}}>
+              <AppButton variant="contained" style={{ backgroundColor: 'var(--text-color)', color: 'var(--bg-color)',}}  onClick={() => {layersUpdateHandle()}}>
                 Загрузить ещё
-            </Button>
-            
-            <div style={{height:'40px', width:'100%'}}></div>
+              </AppButton>
+
+              <div style={{height:'40px', width:'100%'}}></div>
             </> : <></>}
-            
-            
+
         </div>
+      </>
     );
 }
 

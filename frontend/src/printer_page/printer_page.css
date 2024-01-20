@@ -1,12 +1,5 @@
 .printer_page {
-    max-width: 50%; /* или любая другая фиксированная ширина */
-    margin: 0 auto;
-    min-height: 100vh;
-    max-height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: var(--bg-color);
+
 }
 .printer_top {
     margin: 20px 15px;
@@ -21,12 +14,6 @@
     color: var(--text-color);
 }
 
-@media screen and (max-width: 768px) {
-    .printer_page {
-        max-width: 100%; /* или любая другая фиксированная ширина */
-    }
-    
-}
 .content {
     display: flex; 
     justify-content:space-between; 

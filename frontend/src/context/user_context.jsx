@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import api from '../api';
+import AppLoader from "../ui/appLoader/AppLoader";
+import {Grid} from "@mui/material";
 const UserContext = createContext();
 
 
@@ -22,14 +24,16 @@ export const UserProvider =({children}) =>{
 
     useEffect(() => {
         // <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
         const script = document.createElement("script");
         script.src = 'https://telegram.org/js/telegram-web-app.js'
         script.onload = async () => {
             console.log('here', window.Telegram.WebApp.initDataUnsafe)
-            const user = await getUser(window.Telegram.WebApp.initDataUnsafe.user.id)
-            //const user = await getUser(0)
-            setUser(user);
+            // const user = await getUser(window.Telegram.WebApp.initDataUnsafe.user.id)
+            // //const user = await getUser(0)
+            setUser({
+              id: "65ab5298d81b69c07af16664",
+              telegram_chat_id: 86919192
+            });
         }
         document.head.append(script)
     }, [])
@@ -60,10 +64,17 @@ export const UserProvider =({children}) =>{
     // }, [user]);
 
 
+    if (!user) {
+      return <Grid p={2}>
+        <AppLoader />
+      </Grid>
+    }
+
+
     return (
         
         <UserContext.Provider value={{ user, setUser,  }}>
-            {user ? children : <></>}
+          {children}
         </UserContext.Provider>
     );
 }

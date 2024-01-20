@@ -130,7 +130,7 @@ async def get_user_by_telegram_id(telegram_id: str, db: AsyncIOMotorDatabase = D
     return JSONResponse(content=parse_json(user), status_code=status.HTTP_200_OK)
 
 
-@app.get(f"/get_printers_for_user/{{user_id}}/")
+@app.get(f"/get_printers_for_user/{{user_id}}")
 async def get_printers_for_user(user_id: str, db: AsyncIOMotorDatabase = Depends(connect_to_mongo)):
     subs = await db['subs'].find({"user_id": ObjectId(user_id)}).to_list(length=1000)
     printers = []
