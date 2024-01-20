@@ -27,13 +27,8 @@ export const UserProvider =({children}) =>{
         const script = document.createElement("script");
         script.src = 'https://telegram.org/js/telegram-web-app.js'
         script.onload = async () => {
-            console.log('here', window.Telegram.WebApp.initDataUnsafe)
-            // const user = await getUser(window.Telegram.WebApp.initDataUnsafe.user.id)
-            // //const user = await getUser(0)
-            setUser({
-              id: "65ab5298d81b69c07af16664",
-              telegram_chat_id: 86919192
-            });
+            const user = await getUser(window.Telegram.WebApp.initDataUnsafe.user.id);
+            setUser(user);
         }
         document.head.append(script)
     }, [])
@@ -66,7 +61,7 @@ export const UserProvider =({children}) =>{
 
     if (!user) {
       return <Grid p={2}>
-        <AppLoader />
+        <AppLoader loading={true} />
       </Grid>
     }
 
