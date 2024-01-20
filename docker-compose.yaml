@@ -78,8 +78,14 @@ services:
     ports:
       - '3000:3000'
     restart: always
+    volumes:
+      - ./frontend:/app
 
   nginx:
+    depends_on:
+      - frontend
+      - back
+      - minio
     build:
       context: .
       dockerfile: ./nginx/Dockerfile

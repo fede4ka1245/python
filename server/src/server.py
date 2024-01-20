@@ -16,6 +16,8 @@ from shared import connect_to_mongo, close_mongo_connection, parse_json, s3, gen
     create_crud_routes
 from shared.orm import *
 from shared import connect_rabbitmq
+# from pathlib import Path
+# source_path = Path(__file__).resolve()
 
 telegram_bot = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 
@@ -28,7 +30,6 @@ def get_s3_url(path):
 
 
 def process_layer(layer):
-    print(layer)
     res = parse_json(layer)
     res['before_melting_image'] = get_s3_url(layer.get('before_melting_image'))
     res['after_melting_image'] = get_s3_url(layer.get('after_melting_image'))
@@ -150,6 +151,7 @@ async def create_layer(
         order: Annotated[int, Body()],
         project_id: Annotated[str, Body()],
         warns: Annotated[Optional[List[Any]], Body()],
+        recommendation: Annotated[Optional[str], Body()],
         db: AsyncIOMotorDatabase = Depends(connect_to_mongo)
 ):
     try:
@@ -170,7 +172,8 @@ async def create_layer(
             "warns": new_warns,
             "project_id": project_id,
             "order": order,
-            "printer_uid": project["printer_uid"]
+            "printer_uid": project["printer_uid"],
+            "recommendation": recommendation
         }
 
         result = await db["layers"].insert_one(json.loads(json.dumps(response)))
@@ -206,7 +209,7 @@ async def add_photos_to_layer(
         response['after_melting_image'] = f'/{S3_BUCKET_PICS}/{file_name}'
     if svg_image:
         file_name = generate_unique_filename(svg_image.filename)
-        s3.upload_fileobj(svg_image.file, S3_BUCKET_PICS, file_name, ExtraArgs={'ContentType': 'image/svg+xml'})
+        s3.upload_fileobj(svg_image.file, S3_BUCKET_PICS, file_name, ExtraArgs={'ContentType': 'image/jpeg'})
         response['svg_image'] = f'/{S3_BUCKET_PICS}/{file_name}'
 
     if response.get('warns') and len(response.get('warns')) > 0:
@@ -299,8 +302,7 @@ async def get_all_layers_for_project(
         layers = await db["layers"].count_documents({"project_id": project_id})
         total_pages = ceil(layers / limit)
 
-        cursor = db["layers"].find({"project_id": project_id}).skip((page - 1) * limit).limit(limit)
-
+        cursor = db["layers"].find({"project_id": project_id}).sort("order", -1).skip((page - 1) * limit).limit(limit)
         result = [process_layer(layer) for layer in await cursor.to_list(length=limit)]
 
         return JSONResponse(

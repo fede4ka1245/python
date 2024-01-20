@@ -10,3 +10,6 @@ starlette~=0.35.1
 python-multipart
 python-telegram-bot
 pika
+cairosvg
+Pillow
+

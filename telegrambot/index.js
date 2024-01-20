@@ -20,18 +20,24 @@ bot.onText(/\/open_app/, (msg) => this._openWebApp(msg));
 // }
 
 async function notifyUsers(subs, data) {
-  const warnMsgs = ['- повреждение вайпера', '- ошибка распыления порошка'];
-  const msg = ['*Ошибка печати*'];
+  const warnMsgs = ['- Повреждение вайпера', '- Ошибка распыления порошка'];
+  const msg = [`*Ошибка печати. Слой #${data.order}*\n`];
 
   for (const warn of data.warns) {
-      msg.push(warnMsgs[warn.reason]);
+    let message = warnMsgs[warn.reason];
+
+    if (warn?.rate) {
+      message += `. *Критичность:* ${warn?.rate}`;
+    }
+
+    msg.push(message);
   }
 
   const photos = [];
 
-  // if (data.svg_image) {
-  //     photos.push({ type: 'photo', media: getS3Link(data.svg_image) });
-  // }
+  if (data.svg_image) {
+      photos.push({ type: 'photo', media: data.svg_image });
+  }
 
   if (data.before_melting_image) {
       photos.push({ type: 'photo', media: data.before_melting_image });
@@ -53,7 +59,7 @@ async function notifyUsers(subs, data) {
   };
 
   for (const sub of subs) {
-    let text = `\n${msg.join('\n\n')}\n\n`;
+    let text = `${msg.join('\n')}\n`;
 
     if (sub.telegram_chat_id) {
       try {
@@ -74,7 +80,7 @@ async function notifyUsers(subs, data) {
 const mongoURL = `mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}/${MONGO_INITDB_DATABASE}?authSource=admin`;
 
 const start = async (msg) => {
-  await bot.sendMessage(msg.chat.id, 'Это телеграм бот для контроля frontend печати');
+  await bot.sendMessage(msg.chat.id, 'Это телеграм бот для контроля SLM печати');
   await openWebApp(msg);
   await regUser(msg.from.id);
 }
@@ -91,7 +97,7 @@ const openWebApp = async (msg) => {
     inline_keyboard: [[button]]
   };
 
-  await bot.sendMessage(msg.chat.id, 'Нажми на кнопку, чтобы подписаться на обновления frontend принтера 👇', { reply_markup: keyboard });
+  await bot.sendMessage(msg.chat.id, 'Нажми на кнопку, чтобы подписаться на обновления SLM принтера 👇', { reply_markup: keyboard });
 }
 
 const regUser = async (chatId) => {
@@ -115,7 +121,6 @@ const QUEUE_NAME = 'layers';
 
 async function consumeMessages() {
   try {
-    console.log(`amqp://${RABBITMQ_USERNAME}:${RABBITMQ_PASSWORD}@${RABBITMQ_HOST}:${RABBITMQ_PORT}`);
     const connection = await amqp.connect(`amqp://${RABBITMQ_USERNAME}:${RABBITMQ_PASSWORD}@${RABBITMQ_HOST}:${RABBITMQ_PORT}`);
     const channel = await connection.createChannel();
     await channel.assertQueue(QUEUE_NAME, { durable: true });
@@ -125,7 +130,6 @@ async function consumeMessages() {
       try {
         if (message?.content && !message?.content.toString().includes('undefined')) {
           const layer = JSON.parse(message.content.toString());
-          console.log(layer)
           const connection = await MongoClient.connect(mongoURL, { tls: false });
           const db = connection.db()
           const users = await db.collection('subs').find({ printer_uid: layer.printer_uid }).limit(8000).toArray();
