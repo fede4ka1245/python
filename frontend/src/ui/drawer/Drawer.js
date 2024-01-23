@@ -11,4 +11,8 @@ export default styled(MuiDrawer)(({ theme }) => ({
     margin: 'auto 0',
     maxWidth: 'var(--max-content)',
   },
+
+  '& .MuiBackdrop-root': {
+    background: 'rgba(128, 128, 128, 0.6)',
+  },
 }));

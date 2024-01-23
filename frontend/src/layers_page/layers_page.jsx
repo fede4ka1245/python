@@ -1,37 +1,49 @@
 import './layers_page.css';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState, useCallback} from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import LayerInfoDrawerComponent from '../components/layer_info_drawer_component';
- 
-import Button from '@mui/material/Button';
+import { useInView } from 'react-intersection-observer';
 import Fab from '@mui/material/Fab';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import Typography from '@mui/material/Typography';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import axios from 'axios';
 import api from '../api';
 import {Grid, ListItemAvatar} from "@mui/material";
 import AppButton from "../ui/button/Button";
-import Header from "../components/Header";
+import Header from "../components/Header"
+import CachedIcon from '@mui/icons-material/Cached';
+const renderInView = () => {
+  return ({ children }) => {
+    const { ref, inView } = useInView({
+      /* Optional options */
+      threshold: 0.3,
+    });
+  
+    return (
+      <div ref={ref}>
+        {inView && children}
+      </div>
+    )
+  }
+}
+
+const ListWrapper = renderInView()
 
 //нужно чтобы бот находил по id юзера и мог написать ему
 const LayerListItem = ({layer, uid, projectId, navigate }) => {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-
     const toggleDrawer = (open) => (event) => {
-        if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-            return;
-        }
+        // if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+        //     return;
+        // }
         if (!open){
             navigate(``, { replace: true });
         }
         setIsDrawerOpen(open);
     }
-
 
     const createParams = (uid, projectId, layerId) =>{ // uid, projectId, layerId
         const params = new URLSearchParams({
@@ -51,35 +63,36 @@ const LayerListItem = ({layer, uid, projectId, navigate }) => {
         setIsDrawerOpen(true)
         updateUrlWithParams(uid, projectId, layerId, navigate)
     }
+
     return (
         <>
-        <ListItem disablePadding style={{backgroundColor:'var(--bg-color)', borderRadius:'15px', marginBottom:'10px'}} onClick={() =>{listItemOnClick(uid, projectId, layer.id, navigate)}}>
-            <ListItemButton >
-              <ListItemAvatar>
-                <img
-                  loading={'lazy'}
-                  width={'60px'}
-                  height={'60px'}
-                  style={{ borderRadius: 'var(--border-radius-sm)'}}
-                  src={layer.svg_image}
-                />
-              </ListItemAvatar>
-              <Grid flexDirection={'column'} pl={2} display={'flex'} height={'100%'}>
-                <Typography fontWeight={'bold'} color='var(--text-secondary-color)' fontSize={'var(--font-size-md)'}>
-                  Слой #{layer.order}
-                </Typography>
-                {!!layer.warns?.length && <Typography fontWeight={'bold'} color='orange' fontSize={'12px'}>
-                  Ошибка печати
-                </Typography>}
-              </Grid>
-            </ListItemButton>
-        </ListItem>
-        
-        <LayerInfoDrawerComponent layer={layer} isDrawerOpen={isDrawerOpen} toggleDrawer={toggleDrawer} />
+          <ListItem disablePadding style={{backgroundColor:'var(--bg-color)', borderRadius:'15px', marginBottom:'10px'}} onClick={() =>{listItemOnClick(uid, projectId, layer.id, navigate)}}>
+              <ListItemButton >
+                <ListItemAvatar>
+                  <img
+                    loading={'lazy'}
+                    width={'60px'}
+                    height={'60px'}
+                    style={{ borderRadius: 'var(--border-radius-sm)'}}
+                    src={layer.before_melting_image}
+                  />
+                </ListItemAvatar>
+                <Grid flexDirection={'column'} pl={2} display={'flex'} height={'100%'}>
+                  <Typography fontWeight={'bold'} color='var(--text-secondary-color)' fontSize={'var(--font-size-md)'}>
+                    Слой #{layer.order}
+                  </Typography>
+                  {!!layer.warns?.length && <Typography fontWeight={'bold'} color='orange' fontSize={'12px'}>
+                    Ошибка печати
+                  </Typography>}
+                </Grid>
+              </ListItemButton>
+          </ListItem>
+          <LayerInfoDrawerComponent layer={layer} isDrawerOpen={isDrawerOpen} toggleDrawer={toggleDrawer} />
         </>
     )
 }
 
+const MemoLayerList = React.memo(LayerListItem);
 
 
 const LayersPage =() =>{ 
@@ -91,8 +104,7 @@ const LayersPage =() =>{
     const [layersCount, setLayersCount] = useState(0);
     const location = useLocation();
     const { pathname } = location;
-    const parseUid =() =>{
-
+    const parseUid = () =>{
         const regex = /\/printer\/([^\/]+)\//;
         const match = pathname.match(regex);
 
@@ -102,36 +114,32 @@ const LayersPage =() =>{
         } else {
             console.log('Не удалось извлечь testPrinterUid');
         }
-
     }
-    const uid = parseUid()
-    const projectId = pathname.split('/').pop()
+    const uid = useMemo(() => parseUid(), [pathname]);
+    const projectId = useMemo(() => pathname.split('/').pop(), [pathname]);
 
-    const parseProjectData =() =>{
-
-        axios({
-            method:'get',
-            url:`${api}/projects/${projectId}/`
-        }).then(response =>{
-            setProject(response.data)
-        }).catch(error => console.error('Ошибка при получении данных проекта: ' + error))
-
-    }
+    const parseProjectData = useCallback(() => {
+      axios({
+        method: 'get',
+        url: `${api}/projects/${projectId}/`
+      }).then(response => {
+        setProject(response.data)
+      }).catch(error => console.error('Ошибка при получении данных проекта: ' + error));
+    }, [projectId]);
     
-    const parseLayers = () => {
+    const parseLayers = useCallback(() => {
+      axios({
+        method: 'get',
+        url: `${api}/get_all_layers_for_project/${projectId}?page=1&limit=30`
+      }).then(response => {
         
-        axios({
-            method:'get',
-            url:`${api}/get_all_layers_for_project/${projectId}?page=1&limit=10`
-        }).then(response =>{
-            setLayersCount(response.data.size)
-            setLayers(response.data.results)
-            if (response.data.total_pages > 1){
-                setButtonVisible(true)
-            }
-        }).catch(error => console.error('Ошибка при загрузке слоев: ' + error))
-
-    }
+        setLayersCount(response.data.size);
+        setLayers(response.data.results);
+        if (response.data.total_pages > 1) {
+          setButtonVisible(true);
+        }
+      }).catch(error => console.error('Ошибка при загрузке слоев: ' + error));
+    }, [projectId]); 
 
     useEffect(() =>{
         parseProjectData()
@@ -140,7 +148,6 @@ const LayersPage =() =>{
         if (Object.keys(project)?.length !== 0) {
             parseLayers();
         }
-       
     },[project])
     
 
@@ -150,10 +157,11 @@ const LayersPage =() =>{
         navigate(`/printer/${uid}`,)
     }
 
-    const layersUpdateHandle =() =>{
+    const layersUpdateHandle =useCallback(() =>{
+      console.log('up')
         axios({
             method:'get',
-            url:`${api}/get_all_layers_for_project/${projectId}?page=${page+1}&limit=10`
+            url:`${api}/get_all_layers_for_project/${projectId}?page=${page+1}&limit=30`
         }).then(response => {
             setLayers([...layers, ...response.data.results])
             setPage(page +1)
@@ -161,8 +169,7 @@ const LayersPage =() =>{
                 setButtonVisible(false)
             }
         })
-    }
-    const matches = useMediaQuery('(max-width:768px)');
+    },[projectId,page,layers])
     return(
       <>
         <Header>
@@ -190,28 +197,42 @@ const LayersPage =() =>{
               overflow='hidden'
               pl={2}
             >
-              слои: {layers?.length} / {project?.layers_len}
+              слои: {layersCount} / {project?.layers_len}
             </Typography>
+          </Grid>
+          <Grid ml='auto'>
+            <Fab onClick={() => { window.location.reload() }} size={'medium'} sx={{ background: 'var(--primary-color)', minWidth: '48px',  }}>
+              <CachedIcon sx={{color:'var(--bg-color)'}} />
+            </Fab>
           </Grid>
         </Header>
         <div className="layers_page">
-          {layers?.length ? <div className="layer_list_wrapper" style={{padding:'0px 5px'}}>
+          <div className="layer_list_wrapper">
             <List>
-              {layers.map((layer) =>
-                <LayerListItem navigate={navigate} projectId={projectId} uid={uid} layer={layer} key={layer.id} />)}
+              {!!layers.length && layers.map((layer) => (
+                <Grid mb={'var(--space-sm)'} key={layer.id} height={'80px'}>
+                  <ListWrapper>
+                    <MemoLayerList navigate={navigate} projectId={projectId} uid={uid} layer={layer}  />
+                  </ListWrapper>
+                </Grid>
+              ))}
             </List>
-          </div> : <div style={{width:'100%',height:'90vh'}}> <Typography variant="h6" sx={{color:'var(--text-color)', display:'flex', alignItems:'center', justifyContent:'center', width:'100%',height:'100%'}} gutterBottom>
-            Похоже тут ничего нет
-          </Typography></div>}
+          </div>
           {buttonVisible ?
             <>
-              <AppButton variant="contained" style={{ backgroundColor: 'var(--text-color)', color: 'var(--bg-color)',}}  onClick={() => {layersUpdateHandle()}}>
-                Загрузить ещё
+              <AppButton fullWidth variant="contained"   onClick={() => {layersUpdateHandle()}}>
+              <Typography
+                  color={'#d9d9d9'}
+                  fontSize={'var(text-size-sm)'}
+                  fontWeight="bold"
+                  lineHeight={1.6}
+                >
+                  Загрузить ещё
+                </Typography>
               </AppButton>
 
               <div style={{height:'40px', width:'100%'}}></div>
             </> : <></>}
-
         </div>
       </>
     );
