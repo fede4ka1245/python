@@ -95,8 +95,7 @@ const LayerListItem = ({layer, uid, projectId, navigate }) => {
 const MemoLayerList = React.memo(LayerListItem);
 
 
-const LayersPage =() =>{ 
-    
+const LayersPage = () => {
     const [project, setProject] = useState({})
     const [layers,setLayers] = useState([])
     const [buttonVisible, setButtonVisible] = useState(false)
@@ -170,6 +169,7 @@ const LayersPage =() =>{
             }
         })
     },[projectId,page,layers])
+
     return(
       <>
         <Header>
