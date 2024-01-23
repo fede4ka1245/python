@@ -1,2 +1,2 @@
-export const api = process.env.REACT_APP_SERVER_API;
+export const api = 'https://xn------5cdb1ad8amhe1ablncckhggi.xn--p1ai/back/';
 export default api

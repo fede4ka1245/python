@@ -1,8 +1,6 @@
-import React, {useEffect,  useState} from 'react';
+import React, {useCallback, useEffect,  useState} from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { usePrinters } from '../context/printer_context';
  
-import useMediaQuery from '@mui/material/useMediaQuery';
 import Typography from '@mui/material/Typography';
 import Fab from '@mui/material/Fab';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -10,7 +8,6 @@ import ListItemText from '@mui/material/ListItemText';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import Button from '@mui/material/Button';
 
 import './printer_page.css';
 import axios from 'axios';
@@ -18,6 +15,7 @@ import api from '../api';
 import {Grid} from "@mui/material";
 import Header from "../components/Header";
 import AppButton from "../ui/button/Button";
+import { useUser } from '../context/user_context';
 
 const ProjectListItem = ({navigateToProject, project }) => {
     return (
@@ -52,39 +50,44 @@ const ProjectListItem = ({navigateToProject, project }) => {
 const PrinterPage = () => {
     const location = useLocation();
     const { pathname } = location;
-    const parseUid =() =>{
+    const parseUid =useCallback(() =>{
         const uid = pathname.split('/').pop();
         return uid
-    }
+    }, [pathname])
     const uid = parseUid()
-
-    const {printers} = usePrinters();
-    const parsePrinter =(printers) =>{
-        for (let i = 0;i<printers?.length;i++){
-            if (printers[i].uid === uid){
-                return printers[i]
-            }
-        }        
-    }
-    const printer = parsePrinter(printers)
-    
-    const name = printer?.name
-
-    const navigateToProject =({project}) =>{
+    const {user} = useUser()
+    const [printer, setPrinter] = useState(null)
+    useEffect(() =>{
+      axios({
+        method:'get',
+        url:`${api}get_printers_for_user/${user.id}`
+      }).then(res=>{
+        const printers = res.data.printers
+        for (let i =0; i< printers.length; i++){
+          if (uid === printers[i].uid){
+             setPrinter(printers[i])
+             
+          }
+        }
+      }).catch(err =>{
+        console.error(err)
+      })
+    }, [uid, user])
+   const navigate = useNavigate();
+    const navigateToProject =useCallback(({project}) =>{
         navigate(`/printer/${uid}/${project.id}`,)
-    }
+    }, [uid, navigate]);
 
     const [projects, setProjects] = useState([]);
     const [page,setPage] = useState(1);
     const [buttonVisible, setButtonVisible] = useState(false)
-    const parseProjects = () => {
+    const parseProjects = useCallback(() => {
         
         axios({
             method:'get',
             url:`${api}/get_all_projects_for_printer/${uid}?page=1&limit=10`
         }).then(response => {
             setProjects(response.data.results)
-            console.log(response)
             if (response.data.total_pages > 1){
                 setButtonVisible(true)
             }
@@ -94,13 +97,13 @@ const PrinterPage = () => {
         
 
         
-    }
+    }, [uid])
     useEffect(() => {
          parseProjects()
         
     },[uid])
     
-    const projectsUpdateHandle =() =>{
+    const projectsUpdateHandle =useCallback(() =>{
         axios({
             method:'get',
             url:`${api}/get_all_projects_for_printer/${uid}?page=${page+1}&limit=10`
@@ -111,14 +114,13 @@ const PrinterPage = () => {
                 setButtonVisible(false)
             }
         }).catch(error => console.error('Ошибка при загрузке дополнительеый проектов: ' + error))
-    }
+    }, [page, uid, projects])
    
 
-    const media = useMediaQuery('(max-width:768px)'); // MUI хук медиа запрос
-    let navigate = useNavigate();
-    const navigateBack = () => {
+    
+    const navigateBack = useCallback(() => {
         navigate(`/`,)
-    }
+    }, [navigate])
     return (
         <div className='printer_page'>
           <Header>
@@ -134,7 +136,7 @@ const PrinterPage = () => {
               overflow='hidden'
               pl={2}
             >
-              {name}
+              {printer?.name}
             </Typography>
           </Header>
             {projects?.length ?<div className="task_list">
@@ -143,14 +145,12 @@ const PrinterPage = () => {
                         <ProjectListItem navigateToProject={navigateToProject} project={project} key={project.id} />
                     ))}
                 </List>
-            </div> : <div style={{width:'100%',height:'90vh'}}> <Typography variant="h6" sx={{color:'var(--text-color)', display:'flex', alignItems:'center', justifyContent:'center', width:'100%',height:'100%'}} gutterBottom>
-                        Похоже тут ничего нет
-                    </Typography></div>}
+            </div> : <></>}
             {buttonVisible  ? 
             <>
               <AppButton fullWidth onClick={projectsUpdateHandle} variant="filled">
                 <Typography
-                  color={'var(--text-secondary-color)'}
+                  color={'#d9d9d9'}
                   fontSize={'var(text-size-sm)'}
                   fontWeight="bold"
                   lineHeight={1.6}
