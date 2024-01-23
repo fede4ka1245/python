@@ -14,7 +14,7 @@ const getUser = (telegramUserId) => {
         console.log(res)
         console.log('ok')
         return res.data
-    }).catch(error => {
+    }).catch(() => {
          return null;
     })
 }
@@ -27,7 +27,8 @@ export const UserProvider =({children}) =>{
         const script = document.createElement("script");
         script.src = 'https://telegram.org/js/telegram-web-app.js'
         script.onload = async () => {
-            const user = await getUser(window.Telegram.WebApp.initDataUnsafe.user.id);
+            //const user = await getUser(window.Telegram.WebApp.initDataUnsafe.user.id);
+            const user = await getUser(0)
             setUser(user);
         }
         document.head.append(script)

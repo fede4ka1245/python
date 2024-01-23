@@ -1,7 +1,5 @@
 import React, {useState} from 'react';
 import api from '../api';
-import Drawer from '@mui/material/Drawer';
-import Button from '@mui/material/Button';
 import { useUser } from '../context/user_context';
 import axios from 'axios';
 import { usePrinters } from '../context/printer_context';
@@ -10,8 +8,8 @@ import AppButton from "../ui/button/Button";
 import Typography from "@mui/material/Typography";
 import {Grid} from "@mui/material";
 import AppLoader from "../ui/appLoader/AppLoader";
-
-const AddPrinterDrawerComponent = ({setIsAddPrinterDrawerOpen,addPrinterToggleDrawer, uid, setUid, handleUserDataChange, isDrawerOpen, toggleDrawer }) => {
+import { AppDrawer } from './Drawer';
+const AddPrinterDrawerComponent = ({setIsAddPrinterDrawerOpen,addPrinterToggleDrawer, uid, setUid, handleUserDataChange, isDrawerOpen }) => {
   const { user } = useUser();
   const {printers} = usePrinters();
   const [loading, setIsLoading] = useState(false);
@@ -85,7 +83,7 @@ const AddPrinterDrawerComponent = ({setIsAddPrinterDrawerOpen,addPrinterToggleDr
       <div style={{ display: 'flex', justifyContent: 'center', margin: '15px 0px' }}>
         <AppButton fullWidth onClick={handleSubmit} variant="filled">
           <Typography
-            color={'var(--text-secondary-color)'}
+            color={'#d9d9d9'}
             fontSize={'var(text-size-sm)'}
             fontWeight="bold"
             lineHeight={1.8}
@@ -99,26 +97,9 @@ const AddPrinterDrawerComponent = ({setIsAddPrinterDrawerOpen,addPrinterToggleDr
   );
 
   return (
-    <div>
-      <Drawer sx={{
-        '& .MuiDrawer-paper': {
-          maxWidth: '50%',
-          height: 'calc(100vh - 80px)',
-          margin: '0 auto',
-          bgcolor: 'var(--bg-color)',
-          borderRadius: '25px 25px 0 0',
-          '@media (max-width: 768px)': {
-            maxWidth: '100%',
-          }
-        },
-      }}
-        anchor="bottom"
-        open={isDrawerOpen}
-        onClose={toggleDrawer(false)}
-      >
-        {drawerContent()}
-      </Drawer>
-    </div>
+    
+
+    <AppDrawer children={drawerContent()} open={isDrawerOpen} close={addPrinterToggleDrawer(false)} />
   );
 };
 

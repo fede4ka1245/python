@@ -1,21 +1,18 @@
 import './main_page.css';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {  useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import api from '../api';
-import Button from '@mui/material/Button';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
-import IconButton from '@mui/material/IconButton';
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import Typography from '@mui/material/Typography';
 import AddPrinterDrawerComponent from '../components/add_printer_drawer_component';
 import OptionsPrinterDrawerComponent from '../components/options_printer_drawer_component';
 import { usePrinters } from '../context/printer_context';
 import { useUser } from '../context/user_context';
-import {Grid} from "@mui/material";
 import AppButton from '../ui/button/Button';
 import Header from "../components/Header";
 import Tappable from "../ui/tappable/Tappable";
@@ -90,7 +87,7 @@ export default function MainPage() {
             setUid('');
         }
         setIsAddPrinterDrawerOpen(open);
-    };
+    }
 
     let navigate = useNavigate();
     const navigateToPrinter = (printer) =>{
@@ -135,8 +132,10 @@ export default function MainPage() {
                 Принтеры
               </Typography>
               <AppButton onClick={addPrinterToggleDrawer(true)} variant="filled">
+                
                 <Typography
-                  color={'var(--text-secondary-color)'}
+                
+                  color={'#d9d9d9'}
                   fontSize={'var(text-size-sm)'}
                   fontWeight="bold"
                   lineHeight={1.1}
@@ -168,7 +167,7 @@ export default function MainPage() {
                     handleUserDataChange={handleUserDataChange}
                     printers={printers}
                     isDrawerOpen={isAddPrinterDrawerOpen}
-                    toggleDrawer={addPrinterToggleDrawer} />
+                     />
                 <OptionsPrinterDrawerComponent 
                     deletePrinterUid={deletePrinterUid}
                     printers={printers} 
