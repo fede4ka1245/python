@@ -69,7 +69,8 @@ const LayerListItem = ({layer, uid, projectId, navigate }) => {
     return (
         <>
           <ListItem id={`layer-${layer.order}`} disablePadding style={{backgroundColor:'var(--bg-color)', borderRadius:'15px', marginBottom:'10px'}} onClick={() =>{listItemOnClick(uid, projectId, layer.id, navigate)}}>
-              <ListItemButton >
+            <Grid height={'78px'}>
+              <ListItemButton>
                 <ListItemAvatar>
                   <Grid
                     width={'60px'}
@@ -77,7 +78,6 @@ const LayerListItem = ({layer, uid, projectId, navigate }) => {
                   >
                     <ListWrapper>
                       <img
-                        loading={'lazy'}
                         width={'60px'}
                         height={'60px'}
                         style={{ borderRadius: 'var(--border-radius-sm)'}}
@@ -95,6 +95,7 @@ const LayerListItem = ({layer, uid, projectId, navigate }) => {
                   </Typography>}
                 </Grid>
               </ListItemButton>
+            </Grid>
           </ListItem>
           <LayerInfoDrawerComponent layer={layer} isDrawerOpen={isDrawerOpen} toggleDrawer={toggleDrawer} />
         </>
