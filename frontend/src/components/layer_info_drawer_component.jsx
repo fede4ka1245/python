@@ -62,17 +62,21 @@ const LayerInfoDrawerComponent = ({ layer, isDrawerOpen, toggleDrawer }) => {
                   {!!layer.warns?.length && <Grid pt={1} pb={1}>
                     <Alert severity="warning">
                       <AlertTitle>Ошибки</AlertTitle>
-                      {layer.warns.map(({ reason, rate }) => (
-                        <>
-                          {warnMsgs[reason]}. Критичность: {rate.toFixed(4)} <br/>
-                        </>
-                      ))}
+                      <Grid>
+                        {layer.warns.map(({ reason, rate }) => (
+                          <>
+                            {warnMsgs[reason]}. Критичность: {rate.toFixed(4)} <br/>
+                          </>
+                        ))}
+                      </Grid>
                     </Alert>
                   </Grid>}
                   {!!layer.recommendation && <Grid>
                     <Alert severity="info">
                       <AlertTitle>Рекомендация</AlertTitle>
-                      {recommendationMsgs[layer.recommendation]}
+                      <Grid>
+                        {recommendationMsgs[layer.recommendation]}
+                      </Grid>
                     </Alert>
                   </Grid>}
                     <Typography variant="h6" className='img_text'>

@@ -139,15 +139,15 @@ const PrinterPage = () => {
               {printer?.name}
             </Typography>
           </Header>
-            {projects?.length ?<div className="task_list">
+            {projects?.length ?<Grid p={'var(--space-sm)'}>
                 <List>
                     {projects.map((project) => (
                         <ProjectListItem navigateToProject={navigateToProject} project={project} key={project.id} />
                     ))}
                 </List>
-            </div> : <></>}
+            </Grid> : <></>}
             {buttonVisible  ?
-            <>
+              <Grid p={'var(--space-sm)'}>
               <AppButton fullWidth onClick={projectsUpdateHandle} variant="filled">
                 <Typography
                   color={'#d9d9d9'}
@@ -159,7 +159,7 @@ const PrinterPage = () => {
                 </Typography>
               </AppButton>
             <div style={{height:'40px', width:'100%'}}></div>
-            </> : <></>}
+              </Grid> : <></>}
         </div>
     )
 }

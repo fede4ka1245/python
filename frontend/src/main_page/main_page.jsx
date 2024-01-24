@@ -16,6 +16,7 @@ import { useUser } from '../context/user_context';
 import AppButton from '../ui/button/Button';
 import Header from "../components/Header";
 import Tappable from "../ui/tappable/Tappable";
+import {Grid} from "@mui/material";
 
 const PrintListItem = ({printer, navigateToPrinter,handleDeletedPrinter }) => {
     return (
@@ -132,9 +133,7 @@ export default function MainPage() {
                 Принтеры
               </Typography>
               <AppButton onClick={addPrinterToggleDrawer(true)} variant="filled">
-                
                 <Typography
-                
                   color={'#d9d9d9'}
                   fontSize={'var(text-size-sm)'}
                   fontWeight="bold"
@@ -144,7 +143,7 @@ export default function MainPage() {
                 </Typography>
               </AppButton>
             </Header>
-            {!!printers?.length && <div className="print_list_wrapper">
+            {!!printers?.length && <Grid p={'var(--space-sm)'}>
                 <List>
                     {printers.map((printer) => (
                         <PrintListItem 
@@ -156,7 +155,7 @@ export default function MainPage() {
                         />
                     ))}
                 </List>
-            </div>}
+            </Grid>}
             
             <div className="drawers">
                 <AddPrinterDrawerComponent

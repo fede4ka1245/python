@@ -71,13 +71,20 @@ const LayerListItem = ({layer, uid, projectId, navigate }) => {
           <ListItem id={`layer-${layer.order}`} disablePadding style={{backgroundColor:'var(--bg-color)', borderRadius:'15px', marginBottom:'10px'}} onClick={() =>{listItemOnClick(uid, projectId, layer.id, navigate)}}>
               <ListItemButton >
                 <ListItemAvatar>
-                  <img
-                    loading={'lazy'}
+                  <Grid
                     width={'60px'}
                     height={'60px'}
-                    style={{ borderRadius: 'var(--border-radius-sm)'}}
-                    src={layer.svg_image}
-                  />
+                  >
+                    <ListWrapper>
+                      <img
+                        loading={'lazy'}
+                        width={'60px'}
+                        height={'60px'}
+                        style={{ borderRadius: 'var(--border-radius-sm)'}}
+                        src={layer.svg_image}
+                      />
+                    </ListWrapper>
+                  </Grid>
                 </ListItemAvatar>
                 <Grid flexDirection={'column'} pl={2} display={'flex'} height={'100%'}>
                   <Typography fontWeight={'bold'} color='var(--text-secondary-color)' fontSize={'var(--font-size-md)'}>
@@ -280,11 +287,11 @@ const LayersPage = () => {
             </Fab>
           </Grid>
         </Header>
-        <div className="layers_page">
+        <Grid p={'var(--space-sm)'}>
           <div className="layer_list_wrapper">
             <List>
               {!!layers.length && layers.map((layer) => (
-                <Grid mb={'var(--space-sm)'} key={layer.id} height={'80px'}>
+                <Grid mb={'var(--space-sm)'} key={layer.id}>
                   <MemoLayerList navigate={navigate} projectId={projectId} uid={uid} layer={layer}  />
                 </Grid>
               ))}
@@ -305,7 +312,7 @@ const LayersPage = () => {
 
               <div style={{height:'40px', width:'100%'}}></div>
             </> : <></>}
-        </div>
+        </Grid>
       </>
     );
 }
