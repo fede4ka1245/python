@@ -15,7 +15,7 @@ root.render(
   <UserProvider>
     <PrinterProvider>
       <Grid maxWidth='var(--content-width)' width="100vw" ml='auto' mr='auto'>
-        <Grid pl={'var(--space-md)'} pr='var(--space-md)'>
+        <Grid pl={'var(--space-md)'} pr='var(--space-md)' pt={'80px'}>
           <Router>
             <Routes>
               <Route path="/" element={<MainPage />} />

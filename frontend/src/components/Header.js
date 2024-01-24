@@ -5,14 +5,6 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Typography from "@mui/material/Typography";
 
 const Header = ({ children }) => {
-  useEffect(() => {
-    document.body.style.paddingTop = '90px'
-
-    return () => {
-      document.body.style.paddingTop = 'unset'
-    }
-  }, []);
-
   return (
     <Grid
       position='fixed'
