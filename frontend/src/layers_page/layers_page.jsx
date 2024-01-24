@@ -285,9 +285,7 @@ const LayersPage = () => {
             <List>
               {!!layers.length && layers.map((layer) => (
                 <Grid mb={'var(--space-sm)'} key={layer.id} height={'80px'}>
-                  <ListWrapper>
-                    <MemoLayerList navigate={navigate} projectId={projectId} uid={uid} layer={layer}  />
-                  </ListWrapper>
+                  <MemoLayerList navigate={navigate} projectId={projectId} uid={uid} layer={layer}  />
                 </Grid>
               ))}
             </List>
