@@ -23,10 +23,12 @@ async function notifyUsers(subs, data) {
   const warnMsgs = ['- Повреждение вайпера', '- Ошибка распределения порошка'];
   const recommendationMsgs = {
     'fix': 'Надо исправить печать',
-    'ignore': 'Надо игнорировать деффект',
-    'stop': 'Надо останавливать печать'
+    'stop': 'Надо останавливать печать',
+    'ignore': 'Можно проигнорировать дефект, он не влияет на печать проекта',
+    'metal_absence_stop': 'Остановите печать и загрузите металлическый порошок в контейнер',
+    'reslice_stop': 'Остановите процесс и уберите из печати деталь с дефектом'
   };
-  const msg = [`*Ошибка печати. Слой #${data.order}*\n`];
+  const msg = [`*Ошибка печати. Принетер uid: ${data?.printer_uid}. Проект: ${data?.name}. Слой #${data.order}.*\n`];
 
   for (const warn of data.warns) {
     let message = warnMsgs[warn.reason];
@@ -75,9 +77,6 @@ async function notifyUsers(subs, data) {
         photos[0].caption = text
         photos[0].parse_mode = 'markdown'
         await bot.sendMediaGroup(sub.telegram_chat_id, photos);
-        // if (data.svg_image) {
-        //   await bot.sendDocument(sub.telegram_chat_id, data.svg_image);
-        // }
         await bot.sendMessage(sub.telegram_chat_id, 'Нажми на кнопку, чтобы посмотреть деффекты 👇', { reply_markup: keyboard });
       } catch(er) {
         console.log(er);

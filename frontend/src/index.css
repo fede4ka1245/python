@@ -7,6 +7,7 @@ body,
 html {
   background: var(--secondary-bg-color);
   overflow-x: hidden;
+  overscroll-behavior-y: none;
 }
 
 :root {

@@ -16,6 +16,7 @@ import AppButton from "../ui/button/Button";
 import Header from "../components/Header"
 import CachedIcon from '@mui/icons-material/Cached';
 import AppLoader from "../ui/appLoader/AppLoader";
+
 const renderInView = () => {
   return ({ children }) => {
     const { ref, inView } = useInView({
@@ -294,7 +295,7 @@ const LayersPage = () => {
           {buttonVisible ?
             <>
               <AppButton fullWidth variant="contained"   onClick={() => {layersUpdateHandle()}}>
-              <Typography
+                <Typography
                   color={'#d9d9d9'}
                   fontSize={'var(text-size-sm)'}
                   fontWeight="bold"

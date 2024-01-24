@@ -2,7 +2,17 @@ import React from "react"
 import Typography from '@mui/material/Typography';
 import '../layers_page/layer_page_drawer.css'
 import { AppDrawer } from "./Drawer";
-import {Grid} from "@mui/material";
+import {Alert, AlertTitle, Grid} from "@mui/material";
+
+const warnMsgs = ['- Повреждение вайпера', '- Ошибка распределения порошка'];
+const recommendationMsgs = {
+  'fix': 'Надо исправить печать',
+  'stop': 'Надо останавливать печать',
+  'ignore': 'Можно проигнорировать дефект, он не влияет на печать проекта',
+  'metal_absence_stop': 'Остановите печать и загрузите металлическый порошок в контейнер',
+  'reslice_stop': 'Остановите процесс и уберите из печати деталь с дефектом'
+};
+
 const LayerInfoDrawerComponent = ({ layer, isDrawerOpen, toggleDrawer }) => {
     return (
         <>
@@ -49,6 +59,22 @@ const LayerInfoDrawerComponent = ({ layer, isDrawerOpen, toggleDrawer }) => {
                 </Grid>
               </Grid>
                 <div className="drawer_container">
+                  {!!layer.warns?.length && <Grid pt={1} pb={1}>
+                    <Alert severity="warning">
+                      <AlertTitle>Ошибки</AlertTitle>
+                      {layer.warns.map(({ reason, rate }) => (
+                        <>
+                          {warnMsgs[reason]}. Критичность: {rate.toFixed(4)} <br/>
+                        </>
+                      ))}
+                    </Alert>
+                  </Grid>}
+                  {!!layer.recommendation && <Grid>
+                    <Alert severity="info">
+                      <AlertTitle>Рекомендация</AlertTitle>
+                      {recommendationMsgs[layer.recommendation]}
+                    </Alert>
+                  </Grid>}
                     <Typography variant="h6" className='img_text'>
                         SVG
                     </Typography>
