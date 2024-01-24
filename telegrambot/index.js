@@ -28,7 +28,7 @@ async function notifyUsers(subs, data) {
     'metal_absence_stop': 'Остановите печать и загрузите металлическый порошок в контейнер',
     'reslice_stop': 'Остановите процесс и уберите из печати деталь с дефектом'
   };
-  const msg = [`*Ошибка печати. Принетер uid: ${data?.printer_uid}. Проект: ${data?.name}. Слой #${data.order}.*\n`];
+  const msg = [`*Ошибка печати. Принетер uid: ${data?.printer_uid}. Слой #${data.order}.*\n`];
 
   for (const warn of data.warns) {
     let message = warnMsgs[warn.reason];
