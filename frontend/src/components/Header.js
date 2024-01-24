@@ -11,15 +11,14 @@ const Header = ({ children }) => {
       <Grid
         left={0}
         top={0}
-        sx={{ background: 'var(--bg-color)', position: 'sticky'}}
+        width={'100%'}
+        sx={{ background: 'var(--bg-color)', position: 'sticky' }}
         zIndex={100}
         display={'flex'}
         justifyContent={'center'}
         alignItems={'center'}
         borderRadius={'0 0 var(--border-radius-lg) var(--border-radius-lg)'}
         overflow={'hidden'}
-        pl={'10px'}
-        pr={'10px'}
       >
         <Grid
           ml={'auto'}

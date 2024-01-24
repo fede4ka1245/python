@@ -31,7 +31,7 @@ export const AppDrawer = ({ children, open, close }) => {
               <CloseIcon sx={{ color: 'var(--hint-color)' }} />
             </Tappable>
           </Grid>
-          <Grid borderRadius='var(--border-radius-lg) var(--border-radius-lg) 0 0' overflow={'hidden'}>
+          <Grid borderRadius='var(--border-radius-lg) var(--border-radius-lg) 0 0' overflow={'hidden'} sx={{transform: 'translateZ(0)'}}>
             <Grid sx={{ overflowY: 'scroll', height: 'calc(100vh - 80px)' }}>
                 {children}
             </Grid>
