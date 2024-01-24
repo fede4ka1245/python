@@ -108,6 +108,16 @@ create_crud_routes(User, "users", app)
 create_crud_routes(Printer, "printers", app)
 
 
+@app.get(f"/get_printer_by_id/{{uid}}", response_model=Printer)
+async def get_user_by_telegram_id(uid: str, db: AsyncIOMotorDatabase = Depends(connect_to_mongo)):
+    printer = await db['printers'].find_one({"uid": uid})
+
+    if not printer:
+        return JSONResponse(content='user not found', status_code=404)
+
+    return JSONResponse(content=parse_json(printer), status_code=status.HTTP_200_OK)
+
+
 # @app.post(f"/add_printer_for_user/{{user_id}}/")
 # async def add_printer_for_user(user_id: str, printer: int, db: AsyncIOMotorDatabase = Depends(connect_to_mongo)):
 #     result = await db['users'].find_one({"_id": ObjectId(user_id)})
@@ -240,8 +250,7 @@ async def get_all_projects_for_printer(
 
         total_projects = await db["projects"].count_documents({"printer_uid": printer_uid})
         total_pages = ceil(total_projects / limit)
-
-        cursor = db["projects"].find({"printer_uid": printer_uid}).skip((page - 1) * limit).limit(limit)
+        cursor = db["projects"].find({"printer_uid": printer_uid}).skip((total_pages - (page - 1)) * limit).limit(limit)
         result = [parse_json(doc) for doc in await cursor.to_list(length=limit)]
 
         return JSONResponse(

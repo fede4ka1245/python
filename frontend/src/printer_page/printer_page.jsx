@@ -60,7 +60,7 @@ const PrinterPage = () => {
     useEffect(() =>{
       axios({
         method:'get',
-        url:`${api}get_printers_for_user/${user.id}`
+        url:`${api}/get_printers_for_user/${user.id}`
       }).then(res=>{
         const printers = res.data.printers
         for (let i =0; i< printers.length; i++){
@@ -82,7 +82,7 @@ const PrinterPage = () => {
     const [page,setPage] = useState(1);
     const [buttonVisible, setButtonVisible] = useState(false)
     const parseProjects = useCallback(() => {
-        
+
         axios({
             method:'get',
             url:`${api}/get_all_projects_for_printer/${uid}?page=1&limit=10`
@@ -94,13 +94,13 @@ const PrinterPage = () => {
         })
         .catch(error => console.error('Ошибка при получении проектов принтера с uid:' + uid + ':' + error))
 
-        
 
-        
+
+
     }, [uid])
     useEffect(() => {
          parseProjects()
-        
+
     },[uid])
     
     const projectsUpdateHandle =useCallback(() =>{
@@ -146,7 +146,7 @@ const PrinterPage = () => {
                     ))}
                 </List>
             </div> : <></>}
-            {buttonVisible  ? 
+            {buttonVisible  ?
             <>
               <AppButton fullWidth onClick={projectsUpdateHandle} variant="filled">
                 <Typography
@@ -160,7 +160,6 @@ const PrinterPage = () => {
               </AppButton>
             <div style={{height:'40px', width:'100%'}}></div>
             </> : <></>}
-            
         </div>
     )
 }

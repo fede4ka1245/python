@@ -15,7 +15,6 @@ const AddPrinterDrawerComponent = ({setIsAddPrinterDrawerOpen,addPrinterToggleDr
   const [loading, setIsLoading] = useState(false);
 
   const handleSubmit = () => {
-
     if (!uid) {
       return;
     }

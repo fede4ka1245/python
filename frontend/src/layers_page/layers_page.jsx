@@ -1,6 +1,6 @@
 import './layers_page.css';
 import React, {useEffect, useMemo, useState, useCallback} from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import {useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import LayerInfoDrawerComponent from '../components/layer_info_drawer_component';
 import { useInView } from 'react-intersection-observer';
 import Fab from '@mui/material/Fab';
@@ -15,6 +15,7 @@ import {Grid, ListItemAvatar} from "@mui/material";
 import AppButton from "../ui/button/Button";
 import Header from "../components/Header"
 import CachedIcon from '@mui/icons-material/Cached';
+import AppLoader from "../ui/appLoader/AppLoader";
 const renderInView = () => {
   return ({ children }) => {
     const { ref, inView } = useInView({
@@ -66,7 +67,7 @@ const LayerListItem = ({layer, uid, projectId, navigate }) => {
 
     return (
         <>
-          <ListItem disablePadding style={{backgroundColor:'var(--bg-color)', borderRadius:'15px', marginBottom:'10px'}} onClick={() =>{listItemOnClick(uid, projectId, layer.id, navigate)}}>
+          <ListItem id={`layer-${layer.order}`} disablePadding style={{backgroundColor:'var(--bg-color)', borderRadius:'15px', marginBottom:'10px'}} onClick={() =>{listItemOnClick(uid, projectId, layer.id, navigate)}}>
               <ListItemButton >
                 <ListItemAvatar>
                   <img
@@ -74,7 +75,7 @@ const LayerListItem = ({layer, uid, projectId, navigate }) => {
                     width={'60px'}
                     height={'60px'}
                     style={{ borderRadius: 'var(--border-radius-sm)'}}
-                    src={layer.before_melting_image}
+                    src={layer.svg_image}
                   />
                 </ListItemAvatar>
                 <Grid flexDirection={'column'} pl={2} display={'flex'} height={'100%'}>
@@ -93,6 +94,57 @@ const LayerListItem = ({layer, uid, projectId, navigate }) => {
 }
 
 const MemoLayerList = React.memo(LayerListItem);
+
+const loadLayers = (projectId, page, pageSize) => {
+  return axios({
+    method: 'get',
+    url: `${api}/get_all_layers_for_project/${projectId}?page=${page}&limit=${pageSize}`
+  }).then(({ data }) => {
+    return data;
+  })
+}
+
+const loadLayersToOrder = async (order, projectId, pageSize) => {
+  let page = 1;
+  const layers = await loadLayers(projectId, page, pageSize);
+  const pages = Math.floor((layers.results[0].order - order) / pageSize);
+  const additionalLayers = await Promise.all(Array.from({ length: pages }).map(async (_, index) => {
+    const { results } = await loadLayers(projectId, page + index + 1, pageSize)
+
+    return results;
+  }))
+
+  return {
+    ...layers,
+    results: [...layers.results, ...additionalLayers.flat()],
+    current_page: layers.current_page + pages,
+  }
+}
+
+const openLayer = async (order) => {
+  let counter = 0;
+
+  while (true) {
+    counter ++;
+    const el = document.getElementById(`layer-${order}`);
+
+    if (el) {
+      el.scrollIntoView();
+      el.click();
+      return;
+    }
+
+    await new Promise((res) => {
+      setTimeout(res, 300);
+    })
+
+    if (!el && counter === 30) {
+      return;
+    }
+  }
+}
+
+const pageSize = 30;
 
 
 const LayersPage = () => {
@@ -116,6 +168,27 @@ const LayersPage = () => {
     }
     const uid = useMemo(() => parseUid(), [pathname]);
     const projectId = useMemo(() => pathname.split('/').pop(), [pathname]);
+    const [searchParams] = useSearchParams();
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+      if (!!searchParams.get("order")) {
+        setLoading(true);
+        loadLayersToOrder(searchParams.get("order"), projectId, pageSize)
+          .then((response) => {
+            setLayers(response.results);
+            setPage(response.current_page);
+            setLayersCount(response.size);
+            if (response.total_pages > response.current_page) {
+              setButtonVisible(true);
+            }
+          })
+          .finally(async () => {
+            setLoading(false);
+            await openLayer(searchParams.get("order"))
+          })
+      }
+    }, [searchParams]);
 
     const parseProjectData = useCallback(() => {
       axios({
@@ -129,9 +202,8 @@ const LayersPage = () => {
     const parseLayers = useCallback(() => {
       axios({
         method: 'get',
-        url: `${api}/get_all_layers_for_project/${projectId}?page=1&limit=30`
+        url: `${api}/get_all_layers_for_project/${projectId}?page=1&limit=${pageSize}`
       }).then(response => {
-        
         setLayersCount(response.data.size);
         setLayers(response.data.results);
         if (response.data.total_pages > 1) {
@@ -141,10 +213,11 @@ const LayersPage = () => {
     }, [projectId]); 
 
     useEffect(() =>{
-        parseProjectData()
-    },[])
+      parseProjectData();
+    },[]);
+
     useEffect(() =>{ 
-        if (Object.keys(project)?.length !== 0) {
+        if (Object.keys(project)?.length !== 0 && !searchParams.get('order')) {
             parseLayers();
         }
     },[project])
@@ -157,10 +230,9 @@ const LayersPage = () => {
     }
 
     const layersUpdateHandle =useCallback(() =>{
-      console.log('up')
         axios({
             method:'get',
-            url:`${api}/get_all_layers_for_project/${projectId}?page=${page+1}&limit=30`
+            url:`${api}/get_all_layers_for_project/${projectId}?page=${page+1}&limit=${pageSize}`
         }).then(response => {
             setLayers([...layers, ...response.data.results])
             setPage(page +1)
@@ -172,6 +244,7 @@ const LayersPage = () => {
 
     return(
       <>
+        <AppLoader loading={loading} />
         <Header>
           <Fab onClick={navigateBack} size={'medium'} sx={{ background: 'var(--primary-color)', minWidth: '48px' }}>
             <ArrowBackIcon sx={{ color: 'var(--bg-color)', }} />

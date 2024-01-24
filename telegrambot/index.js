@@ -20,17 +20,26 @@ bot.onText(/\/open_app/, (msg) => this._openWebApp(msg));
 // }
 
 async function notifyUsers(subs, data) {
-  const warnMsgs = ['- Повреждение вайпера', '- Ошибка распыления порошка'];
+  const warnMsgs = ['- Повреждение вайпера', '- Ошибка распределения порошка'];
+  const recommendationMsgs = {
+    'fix': 'Надо исправить печать',
+    'ignore': 'Надо игнорировать деффект',
+    'stop': 'Надо останавливать печать'
+  };
   const msg = [`*Ошибка печати. Слой #${data.order}*\n`];
 
   for (const warn of data.warns) {
     let message = warnMsgs[warn.reason];
 
     if (warn?.rate) {
-      message += `. *Критичность:* ${warn?.rate}`;
+      message += `. *Критичность: ${warn?.rate.toFixed(4)}*`;
     }
 
     msg.push(message);
+  }
+
+  if (data?.recommendation && recommendationMsgs[data?.recommendation]) {
+    msg.push(`\n\n*Рекомендация: ${recommendationMsgs[data?.recommendation]}*`);
   }
 
   const photos = [];
@@ -50,7 +59,7 @@ async function notifyUsers(subs, data) {
   const button = {
     text: 'Открыть приложение',
     web_app: {
-      url: `${SITE_URL}/printer/${data?.printer_uid}/${data?.project_id}`
+      url: `${SITE_URL}/printer/${data?.printer_uid}/${data?.project_id}?order=${data.order}`
     }
   };
 
