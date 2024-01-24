@@ -89,9 +89,11 @@ async function notifyUsers(subs, data) {
 const mongoURL = `mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}/${MONGO_INITDB_DATABASE}?authSource=admin`;
 
 const start = async (msg) => {
-  await bot.sendMessage(msg.chat.id, 'Это телеграм бот для контроля SLM печати');
-  await openWebApp(msg);
-  await regUser(msg.from.id);
+  try {
+      await bot.sendMessage(msg.chat.id, 'Это телеграм бот для контроля SLM печати');
+      await openWebApp(msg);
+      await regUser(msg.from.id);
+  } catch {}
 }
 
 const openWebApp = async (msg) => {
@@ -106,7 +108,9 @@ const openWebApp = async (msg) => {
     inline_keyboard: [[button]]
   };
 
-  await bot.sendMessage(msg.chat.id, 'Нажми на кнопку, чтобы подписаться на обновления SLM принтера 👇', { reply_markup: keyboard });
+  try {
+    await bot.sendMessage(msg.chat.id, 'Нажми на кнопку, чтобы подписаться на обновления SLM принтера 👇', { reply_markup: keyboard });
+  } catch {}
 }
 
 const regUser = async (chatId) => {
