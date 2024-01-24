@@ -84,7 +84,7 @@ const LayerInfoDrawerComponent = ({ layer, isDrawerOpen, toggleDrawer }) => {
                         alt=""
                     />
                     <Typography variant="h6" className='img_text'>
-                        До плавлния
+                        До плавления
                     </Typography>
                     <img className={'img-preview'}
                         src={layer.before_melting_image} alt="" />
