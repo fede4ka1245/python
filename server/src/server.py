@@ -250,7 +250,7 @@ async def get_all_projects_for_printer(
 
         total_projects = await db["projects"].count_documents({"printer_uid": printer_uid})
         total_pages = ceil(total_projects / limit)
-        cursor = db["projects"].find({"printer_uid": printer_uid}).skip((total_pages - (page - 1)) * limit).limit(limit)
+        cursor = db["projects"].find({"printer_uid": printer_uid}).sort({"_id": -1}).limit(limit)
         result = [parse_json(doc) for doc in await cursor.to_list(length=limit)]
 
         return JSONResponse(
