@@ -1,18 +1,28 @@
 import React, {useEffect} from 'react';
-import {Grid} from "@mui/material";
+import {Grid, Slide, useScrollTrigger} from "@mui/material";
 import Fab from "@mui/material/Fab";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Typography from "@mui/material/Typography";
 import {createPortal} from "react-dom";
 
+function HideOnScroll({ children }) {
+  const trigger = useScrollTrigger();
+
+  return (
+    <Slide appear={false} direction="down" in={!trigger}>
+      {children}
+    </Slide>
+  );
+}
+
 const Header = ({ children }) => {
   return (
-    <>
+    <HideOnScroll>
       <Grid
         left={0}
         top={0}
         width={'100%'}
-        sx={{ background: 'var(--bg-color)', position: 'fixed' }}
+        sx={{ background: 'var(--bg-color)', position: 'fixed', boxShadow: 'rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px' }}
         zIndex={100}
         display={'flex'}
         justifyContent={'center'}
@@ -32,7 +42,7 @@ const Header = ({ children }) => {
           {children}
         </Grid>
       </Grid>
-    </>
+    </HideOnScroll>
   );
 };
 

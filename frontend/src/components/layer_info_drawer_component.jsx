@@ -1,8 +1,15 @@
-import React from "react"
+import React, {useCallback, useState} from "react"
 import Typography from '@mui/material/Typography';
 import '../layers_page/layer_page_drawer.css'
 import { AppDrawer } from "./Drawer";
 import {Alert, AlertTitle, Grid} from "@mui/material";
+import {
+  TransformWrapper,
+  TransformComponent
+} from "react-zoom-pan-pinch";
+import {createPortal} from "react-dom";
+import Tappable from "../ui/tappable/Tappable";
+import CloseIcon from "@mui/icons-material/Close";
 
 const warnMsgs = ['- Повреждение вайпера', '- Ошибка распределения порошка'];
 const recommendationMsgs = {
@@ -12,6 +19,74 @@ const recommendationMsgs = {
   'metal_absence_stop': 'Увеличьте подачу или загрузите металлическый порошок в контейнер',
   'reslice_stop': 'Остановите процесс и уберите из печати деталь с дефектом'
 };
+
+const ImageWrapper = (props) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggle = useCallback(() => {
+    setIsOpen((value) => !value)
+  }, [])
+
+  return (
+    <>
+      <img
+        onClick={toggle}
+        {...props}
+      />
+      {
+        createPortal(<>
+          {isOpen && <div
+            style={{
+              position: "fixed",
+              left: 0,
+              top: 0,
+              zIndex: 100000,
+              width: '100vw',
+              height: '100vh',
+              background: 'rgba(47,47,47,0.9)'
+            }}
+          >
+            <Grid
+              display='flex'
+              justifyContent='center'
+              alignItems='center'
+              position='fixed'
+              right='20px'
+              top='20px'
+              zIndex={10000}
+              onClick={toggle}
+            >
+              <Tappable
+                style={{
+                  border: 'var(--element-border)',
+                  borderRadius: '50%',
+                  width: '46px',
+                  height: '46px',
+                  background: 'var(--bg-color)'
+                }}
+              >
+                <CloseIcon sx={{ color: 'var(--hint-color)' }} />
+              </Tappable>
+            </Grid>
+            <TransformWrapper>
+              <TransformComponent>
+                <img
+                  style={{
+                    objectFit: 'contain',
+                    width: '100vw',
+                    height: '100vh',
+                  }}
+                  {...props}
+                />
+              </TransformComponent>
+            </TransformWrapper>
+          </div>}
+        </>, window.document.body)
+      }
+    </>
+  )
+}
+
 
 const LayerInfoDrawerComponent = ({ layer, isDrawerOpen, toggleDrawer }) => {
     return (
@@ -82,21 +157,25 @@ const LayerInfoDrawerComponent = ({ layer, isDrawerOpen, toggleDrawer }) => {
                     <Typography variant="h6" className='img_text'>
                         SVG
                     </Typography>
-                    <img
-                        className={'img-preview'}
-                        src={layer.svg_image}
-                        alt=""
+                    <ImageWrapper
+                      className={'img-preview'}
+                      src={layer.svg_image}
+                      alt=""
                     />
                     <Typography variant="h6" className='img_text'>
                         До плавления
                     </Typography>
-                    <img className={'img-preview'}
-                        src={layer.before_melting_image} alt="" />
+                    <ImageWrapper
+                      className={'img-preview'}
+                      src={layer.before_melting_image} alt=""
+                    />
                     <Typography variant="h6" className='img_text'>
                         После плавления
                     </Typography>
-                    <img className={'img-preview'}
-                        src={layer.after_melting_image} alt="" />
+                    <ImageWrapper
+                      className={'img-preview'}
+                      src={layer.after_melting_image} alt=""
+                    />
                 </div>
             </AppDrawer>
         </>
