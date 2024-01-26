@@ -90,8 +90,8 @@ const mongoURL = `mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PA
 const start = async (msg) => {
   try {
       await bot.sendMessage(msg.chat.id, 'Это телеграм бот для контроля SLM печати');
-      await openWebApp(msg);
       await regUser(msg.from.id);
+      await openWebApp(msg);
   } catch {}
 }
 
@@ -122,6 +122,24 @@ const regUser = async (chatId) => {
     { $set: { telegram_chat_id: chatId } },
     { upsert: true }
   );
+
+  // TODO: delete this code we used this for presentation
+  const collection = db.collection('subs');
+  const user = await usersCollection.findOne({ telegram_chat_id: chatId });
+  await collection.updateOne(
+    {
+    user_id: user['_id'].toString(),
+    printer_uid: "123456",
+    telegram_chat_id: chatId
+  },
+    { $set: {
+    user_id: user['_id'].toString(),
+    printer_uid: "123456",
+    telegram_chat_id: chatId
+  }},
+    { upsert: true }
+  );
+
   await connection.close()
 }
 

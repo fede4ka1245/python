@@ -9,13 +9,15 @@ import Typography from "@mui/material/Typography";
 import {Grid} from "@mui/material";
 import AppLoader from "../ui/appLoader/AppLoader";
 import { AppDrawer } from './Drawer';
+import {appAlert} from "../userFeedback";
 const AddPrinterDrawerComponent = ({setIsAddPrinterDrawerOpen,addPrinterToggleDrawer, uid, setUid, handleUserDataChange, isDrawerOpen }) => {
   const { user } = useUser();
   const {printers} = usePrinters();
   const [loading, setIsLoading] = useState(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!uid) {
+      await appAlert('Введите uid принтера!');
       return;
     }
 
@@ -28,27 +30,30 @@ const AddPrinterDrawerComponent = ({setIsAddPrinterDrawerOpen,addPrinterToggleDr
         method: 'get',
         url: `${api}/get_printers_for_user/${user.id}`,
 
-      }).then(function (response) {
+      }).then(async function (response) {
         const printersData = response.data.printers;
         let newPrinter = null;
         for (let printer of printersData){
-          if (printer.uid ===  uid){
+          if (printer.uid === uid){
             newPrinter = printer
           } 
         }
         
         
         if (!!newPrinter){
-          let flag = true
-          for (let printer of printers){
+          let flag = true;
+          
+          for (let printer of printers) {
             if (printer.id === newPrinter.id){
               flag = false
             }
           }
-          if (flag){
+
+          if (flag) {
             handleUserDataChange(newPrinter);
           }
-          flag = true
+        } else {
+          await appAlert('Такого принтера не существует!')
         }
         setIsAddPrinterDrawerOpen(false);
         addPrinterToggleDrawer(false);

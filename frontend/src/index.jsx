@@ -10,6 +10,7 @@ import MainPage from './main_page/main_page';
 import PrinterPage from './printer_page/printer_page'
 import LayersPage from './layers_page/layers_page';
 import PageContainer from "./components/PageContainer";
+import {UserFeedback} from "./userFeedback";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -24,6 +25,7 @@ root.render(
           </Routes>
         </Router>
       </PageContainer>
+      <UserFeedback />
     </PrinterProvider>
   </UserProvider>
 );

@@ -11,11 +11,13 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import axios from 'axios';
 import api from '../api';
-import {Grid, ListItemAvatar} from "@mui/material";
+import {CircularProgress, Grid, ListItemAvatar} from "@mui/material";
 import AppButton from "../ui/button/Button";
 import Header from "../components/Header"
 import CachedIcon from '@mui/icons-material/Cached';
 import AppLoader from "../ui/appLoader/AppLoader";
+import Button from "@mui/material/Button";
+import {appAlert} from "../userFeedback";
 
 const renderInView = () => {
   return ({ children }) => {
@@ -249,7 +251,16 @@ const LayersPage = () => {
                 setButtonVisible(false)
             }
         })
-    },[projectId,page,layers])
+    },[projectId,page,layers]);
+
+    const [isLayerStopping, setIsLayerStopping] = useState(false);
+    const onStopLayer = useCallback(async() => {
+      setIsLayerStopping(true);
+      setTimeout(async () => {
+        await appAlert('У вас недостаточно прав, чтобы остановить печать')
+        setIsLayerStopping(false);
+      }, 1500);
+    }, []);
 
     return(
       <>
@@ -289,6 +300,25 @@ const LayersPage = () => {
           </Grid>
         </Header>
         <Grid p={'var(--space-sm)'}>
+          <div style={{ display: 'flex', borderRadius: '12px', padding: '10px', alignItems: 'center', flexDirection: 'column', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}>
+            <Button
+              loading={isLayerStopping && 'loading'}
+              fullWidth
+              onClick={onStopLayer}
+              style={{ borderRadius: 'var(border-radius-sm)' }}
+              color='error'
+              variant="outlined"
+            >
+              {!isLayerStopping ? "Остановить печать" : (
+                <CircularProgress
+                  size={23}
+                  color={'error'}
+                />
+              )}
+            </Button>
+          </div>
+        </Grid>
+        <Grid p={'var(--space-sm)'}>
           <div className="layer_list_wrapper">
             <List>
               {!!layers.length && layers.map((layer) => (
@@ -310,8 +340,7 @@ const LayersPage = () => {
                   Загрузить ещё
                 </Typography>
               </AppButton>
-
-              <div style={{height:'40px', width:'100%'}}></div>
+              <div style={{height:'80px', width:'100%'}}></div>
             </> : <></>}
         </Grid>
       </>
