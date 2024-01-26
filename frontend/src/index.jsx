@@ -9,8 +9,8 @@ import { UserProvider } from './context/user_context';
 import MainPage from './main_page/main_page';
 import PrinterPage from './printer_page/printer_page'
 import LayersPage from './layers_page/layers_page';
-import {Grid} from "@mui/material";
 import PageContainer from "./components/PageContainer";
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <UserProvider>

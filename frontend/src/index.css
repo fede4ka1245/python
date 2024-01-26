@@ -6,7 +6,6 @@
 body,
 html {
   background: var(--secondary-bg-color);
-  overflow: hidden;
   position: relative;
   overscroll-behavior-y: none;
 }

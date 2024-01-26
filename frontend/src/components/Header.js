@@ -12,7 +12,7 @@ const Header = ({ children }) => {
         left={0}
         top={0}
         width={'100%'}
-        sx={{ background: 'var(--bg-color)', position: 'sticky' }}
+        sx={{ background: 'var(--bg-color)', position: 'fixed' }}
         zIndex={100}
         display={'flex'}
         justifyContent={'center'}
