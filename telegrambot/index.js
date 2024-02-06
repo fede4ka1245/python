@@ -13,7 +13,7 @@ const S3_PUBLIC_URL = process.env.S3_PUBLIC_URL
 
 const bot = new TelegramBot(TELEGRAM_TOKEN, { polling: true });
 bot.onText(/\/start/, (msg) => start(msg));
-bot.onText(/\/open_app/, (msg) => this._openWebApp(msg));
+bot.onText(/\/open_app/, (msg) => openWebApp(msg));
 
 // const getS3Link = (path) => {
 //     return S3_PUBLIC_URL + path;
@@ -28,7 +28,7 @@ async function notifyUsers(subs, data) {
     'metal_absence_stop': 'Увеличьте подачу или загрузите металлическый порошок в контейнер',
     'reslice_stop': 'Остановите процесс и уберите из печати деталь с дефектом'
   };
-  const msg = [`*Ошибка печати. Принетер uid: ${data?.printer_uid}. Слой #${data.order}.*\n`];
+  const msg = [`*Ошибка печати. Принтер uid: ${data?.printer_uid}. Слой #${data.order}.*\n`];
 
   for (const warn of data.warns) {
     let message = warnMsgs[warn.reason];
