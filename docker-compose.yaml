@@ -71,8 +71,6 @@ services:
     restart: always
     env_file:
       - .env
-    volumes:
-      - ./telegrambot:/app
 
   frontend:
     hostname: frontend
