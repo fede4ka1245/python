@@ -8,7 +8,7 @@ server {
     proxy_set_header X-Real-IP $remote_addr;
   }
 
-  location /s3files/ {
+  location /app-files/ {
     proxy_pass http://minio:9000/;
     proxy_set_header Accept-Encoding "";
     proxy_set_header Host $host;
