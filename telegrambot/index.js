@@ -128,12 +128,12 @@ const regUser = async (chatId) => {
   const user = await usersCollection.findOne({ telegram_chat_id: chatId });
   await collection.updateOne(
     {
-    user_id: user['_id'].toString(),
+    user_id: user['_id'],
     printer_uid: "123456",
     telegram_chat_id: chatId
   },
     { $set: {
-    user_id: user['_id'].toString(),
+    user_id: user['_id'],
     printer_uid: "123456",
     telegram_chat_id: chatId
   }},
