@@ -288,7 +288,7 @@ async def unsubscribe_from_printer(
 ):
     try:
         result = await db['subs'].delete_one(
-            {"user_id": ObjectId(user_id), "printer_uid": printer_uid}
+            {"user_id": user_id, "printer_uid": printer_uid}
         )
         if result.deleted_count == 0:
             raise HTTPException(status_code=404, detail="Subscription not found")
